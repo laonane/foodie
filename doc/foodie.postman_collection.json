@@ -1,0 +1,90 @@
+{
+	"info": {
+		"_postman_id": "d3bc1eea-84dc-482f-83c4-292f58d359df",
+		"name": "foodie",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "用户名是否存在",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8088/passport/usernameIsExist?username=laona",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"passport",
+						"usernameIsExist"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "laona"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "用户注册",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"laona\",\r\n    \"password\": \"123123\",\r\n    \"confirmPassword\": \"123123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8088/passport/regist",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"passport",
+						"regist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "用户登录",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"laona\",\r\n    \"password\": \"123123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8088/passport/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"passport",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
