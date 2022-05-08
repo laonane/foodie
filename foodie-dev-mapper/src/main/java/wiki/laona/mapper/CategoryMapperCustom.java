@@ -1,8 +1,11 @@
 package wiki.laona.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import wiki.laona.pojo.vo.CategoryVO;
+import wiki.laona.pojo.vo.NewItemsVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author laona
@@ -19,4 +22,11 @@ public interface CategoryMapperCustom {
      */
 
     public List<CategoryVO> getSubCatList(Integer rootCatId);
+
+    /**
+     * 获取首页推荐的商品信息
+     * @param map map
+     * @return 商品信息
+     */
+    public List<NewItemsVO> getSixNewItemsLazy(@Param("paramMap") Map<String, Object> map);
 }

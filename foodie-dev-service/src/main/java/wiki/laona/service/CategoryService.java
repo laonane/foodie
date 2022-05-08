@@ -2,6 +2,7 @@ package wiki.laona.service;
 
 import wiki.laona.pojo.Category;
 import wiki.laona.pojo.vo.CategoryVO;
+import wiki.laona.pojo.vo.NewItemsVO;
 
 import java.util.List;
 
@@ -25,4 +26,11 @@ public interface CategoryService {
      * @return 子分类列表
      */
     public List<CategoryVO> getSubCatList(Integer rootCatId);
+
+    /**
+     * 获取首页推荐的六个商品
+     * @param rootCatId 一级分类 id
+     * @return 商品信息
+     */
+    public List<NewItemsVO> getSixNewItemsLazy(Integer rootCatId);
 }
