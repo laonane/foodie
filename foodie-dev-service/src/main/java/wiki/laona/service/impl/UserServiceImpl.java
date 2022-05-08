@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
 
     private static final String USER_FACE = "http://122.152.205.72:88/group1/M00/00/05/CpoxxFw_8_qAIlFXAAAcIhVPdSg994.png";
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
     @Override
     public boolean queryUsernameIsExists(String username) {
 
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
         return !ObjectUtils.isEmpty(result);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
     public Users createUser(UserBo userBo) {
 
@@ -85,6 +85,7 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
     @Override
     public Users queryUserForLogin(String username, String password) {
         Example userExample = new Example(Users.class);

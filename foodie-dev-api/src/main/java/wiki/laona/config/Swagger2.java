@@ -37,11 +37,11 @@ public class Swagger2 {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("天天吃货 电商平台接口api")        // 文档页标题
+                .title("Foodie 接口api")        // 文档页标题
                 .contact(new Contact("laona",
                         "https://www.laona.wiki",
                         "laonane@google.com"))        // 联系人信息
-                .description("专为天天吃货提供的api文档")  // 详细信息
+                .description("专为 Foodie 提供的api文档")  // 详细信息
                 .version("1.0.1")   // 文档版本号
                 .termsOfServiceUrl("https://www.laona.wiki") // 网站地址
                 .build();
