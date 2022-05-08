@@ -75,7 +75,9 @@ public class PassportController {
         }
         // 5. 注册用户
         Users userResult = userService.createUser(userBo);
+        // 去除隐私信息
         setNullProperty(userResult);
+
         // 6. 保存 cookie
         CookieUtils.setCookie(req, resp, "user", JsonUtils.objectToJson(userResult), true);
 
@@ -103,17 +105,19 @@ public class PassportController {
         String username = userBo.getUsername().trim();
         String password = userBo.getPassword().trim();
 
-        if (StringUtils.isBlank(username) || StringUtils.isBlank(password) ) {
+        if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             return JsonResult.errorMsg("用户名或密码不能为空");
         }
 
-        Users userResult = userService.queryUserForLogin(username,
-                MD5Utils.getMD5Str(password));
+        Users userResult = userService.queryUserForLogin(username, MD5Utils.getMD5Str(password));
 
         if (ObjectUtils.isEmpty(userResult)) {
             return JsonResult.errorMsg("用户名或密码不正确");
         }
 
+        setNullProperty(userResult);
+
+        // 用户信息设置到 cookie
         CookieUtils.setCookie(req, resp, "user", JsonUtils.objectToJson(userResult), true);
         return JsonResult.ok(userResult);
     }

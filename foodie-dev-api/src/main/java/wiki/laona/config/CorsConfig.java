@@ -18,22 +18,23 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         // 1. 添加 cors 配置
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:8088");
+        // 此处是前端的请求地址，tomcat 默认 8080
+        config.addAllowedOrigin("http://localhost:8080");
 
-        // 设置是否允许发送 cookie
+        // 设置是否发送cookie信息
         config.setAllowCredentials(true);
 
         // 设置允许请求的方式
         config.addAllowedMethod("*");
 
-        // 设置允许的 header
-        config.addAllowedMethod("*");
+        // 设置允许的header
+        config.addAllowedHeader("*");
 
-        // 2. url 添加映射路径
+        // 2. 为url添加映射路径
         UrlBasedCorsConfigurationSource corsSource = new UrlBasedCorsConfigurationSource();
         corsSource.registerCorsConfiguration("/**", config);
 
-        // 3. 返回重新定义好的 corsSource
+        // 3. 返回重新定义好的corsSource
         return new CorsFilter(corsSource);
     }
 }
