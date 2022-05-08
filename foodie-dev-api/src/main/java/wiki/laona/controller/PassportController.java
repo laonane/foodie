@@ -122,4 +122,15 @@ public class PassportController {
         return JsonResult.ok(userResult);
     }
 
+    @ApiOperation(value = "退出登录", notes = "退出登录", httpMethod = "POST")
+    @PostMapping("/logout")
+    public JsonResult logout(@RequestParam String userId, HttpServletRequest req, HttpServletResponse resp) {
+        // 清除用户相关的 cookie 信息
+        CookieUtils.deleteCookie(req, resp, "user");
+
+        // TODO 用户退出登录，就需要清空购物车
+        // TODO 分布式绘画中需要清除用户数据
+
+        return JsonResult.ok();
+    }
 }
