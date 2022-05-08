@@ -12,9 +12,10 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+@SuppressWarnings("all")
 @Configuration
 @EnableSwagger2
-// @EnableSwaggerBootstrapUI
+@EnableSwaggerBootstrapUI
 public class Swagger2 {
 
     //    http://localhost:8088/swagger-ui.html     原路径

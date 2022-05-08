@@ -9,32 +9,31 @@ import org.springframework.web.filter.CorsFilter;
 /**
  * @author laona
  * @description 跨域配置
- * @date 2022-05-06 11:46
+ * @create 2022-05-02 15:32
  **/
 @Configuration
 public class CorsConfig {
 
-    public CorsConfig() {
-    }
-
     @Bean
     public CorsFilter corsFilter() {
-        // 1. 添加cors配置信息
+        // 1. 添加 cors 配置
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:8080");
-        // config.addAllowedOrigin("http://172.16.23.224:8080");
-        // 设置允许的header
-        config.addAllowedHeader("*");
-        // 设置允许请求的方式
-        config.addAllowedMethod("*");
-        // 设置是否发送cookie信息
+        config.addAllowedOrigin("http://localhost:8088");
+
+        // 设置是否允许发送 cookie
         config.setAllowCredentials(true);
 
-        // 2. 为url添加映射路径
-        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", config);
+        // 设置允许请求的方式
+        config.addAllowedMethod("*");
 
-        // 3. 返回重新定义好的corsSource
-        return new CorsFilter(urlBasedCorsConfigurationSource);
+        // 设置允许的 header
+        config.addAllowedMethod("*");
+
+        // 2. url 添加映射路径
+        UrlBasedCorsConfigurationSource corsSource = new UrlBasedCorsConfigurationSource();
+        corsSource.registerCorsConfiguration("/**", config);
+
+        // 3. 返回重新定义好的 corsSource
+        return new CorsFilter(corsSource);
     }
 }
