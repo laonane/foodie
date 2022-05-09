@@ -54,7 +54,7 @@ public class ItemsController extends BaseController{
     }
 
     @ApiOperation(value = "查询商品评论等级", notes = "查询商品评论等级", httpMethod = "GET")
-    @GetMapping("commentLevel")
+    @GetMapping("/commentLevel")
     public JsonResult commentLevel(
             @ApiParam(name = "itemId", value = "商品id", required = false) @RequestParam String itemId) {
 
@@ -69,10 +69,10 @@ public class ItemsController extends BaseController{
 
 
     @ApiOperation(value = "查询商品评论详情", notes = "查询商品评论详情", httpMethod = "GET")
-    @GetMapping("comments")
+    @GetMapping("/comments")
     public JsonResult comments(
             @ApiParam(name = "itemId", value = "商品id", required = true) @RequestParam String itemId,
-            @ApiParam(name = "level", value = "评论等级", required = false) @RequestParam Integer level,
+            @ApiParam(name = "level", value = "评论等级", required = false) @RequestParam(defaultValue = "0") Integer level,
             @ApiParam(name = "page", value = "查询下一页是第几页", required = false) @RequestParam Integer page,
             @ApiParam(name = "pageSize", value = "分页的每一页显示的条数", required = false) @RequestParam Integer pageSize) {
 
@@ -87,7 +87,10 @@ public class ItemsController extends BaseController{
         if (pageSize == null) {
             pageSize = COMMENT_PAGE_SIZE;
         }
-
+        /*  bug fix: 解决查看全部评论时，level为空的命令 */
+        if (level == 0) {
+            level = null;
+        }
         PagedGridResult result = itemService.queryPagedComments(itemId, level, page, pageSize);
 
         return JsonResult.ok(result);

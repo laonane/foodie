@@ -17,5 +17,5 @@ public interface ItemsMapperCustom extends MyMapper<Items> {
      * @param paramsMap 参数
      * @return 评论详情
      */
-    public List<ItemCommentVO> queryItemComments(@Param("paramsMap") Map<String, Object> paramsMap);
+    public List<ItemCommentVO> queryItemComments(@Param("paramsMap") Map<String, Object> map);
 }
