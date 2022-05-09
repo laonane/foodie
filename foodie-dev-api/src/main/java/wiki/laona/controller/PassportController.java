@@ -2,6 +2,7 @@ package wiki.laona.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
@@ -32,7 +33,8 @@ public class PassportController {
 
     @ApiOperation(value = "用户名是否存在", notes = "用户名是否存在", httpMethod = "GET")
     @GetMapping("/usernameIsExist")
-    public JsonResult usernameIsExist(@RequestParam String username) {
+    public JsonResult usernameIsExist(
+            @ApiParam(name = "username", value = "用户名", required = false) @RequestParam String username) {
         // 判空
         if (StringUtils.isBlank(username)) {
             return JsonResult.errorMsg("用户名不能为空");

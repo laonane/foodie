@@ -5,17 +5,16 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import wiki.laona.pojo.Items;
 import wiki.laona.pojo.ItemsImg;
 import wiki.laona.pojo.ItemsParam;
 import wiki.laona.pojo.ItemsSpec;
+import wiki.laona.pojo.vo.CommentLevelCountsVO;
 import wiki.laona.pojo.vo.ItemInfoVO;
 import wiki.laona.service.ItemService;
 import wiki.laona.utils.JsonResult;
+import wiki.laona.utils.PagedGridResult;
 
 import java.util.List;
 
@@ -27,15 +26,14 @@ import java.util.List;
 @Api(value = "商品接口", tags = {"商品信息展示相关接口"})
 @RestController
 @RequestMapping("items")
-public class ItemsController {
+public class ItemsController extends BaseController{
 
     @Autowired
     private ItemService itemService;
 
     @ApiOperation(value = "查询商品详情", notes = "查询商品详情", httpMethod = "GET")
     @GetMapping("info/{itemId}")
-    @ApiParam(name = "itemId", value = "商品id")
-    public JsonResult info(@PathVariable String itemId) {
+    public JsonResult info(@ApiParam(name = "itemId", value = "商品id", required = false) @PathVariable String itemId) {
 
         if (StringUtils.isBlank(itemId)) {
             return JsonResult.errorMsg(null);
@@ -46,6 +44,52 @@ public class ItemsController {
         List<ItemsSpec> itemSpecList = itemService.queryItemSpecList(itemId);
         ItemsParam itemParam = itemService.queryItemParam(itemId);
 
-        return JsonResult.ok(new ItemInfoVO(item, itemImgList, itemSpecList, itemParam));
+        ItemInfoVO itemInfo = new ItemInfoVO();
+        itemInfo.setItem(item);
+        itemInfo.setItemImgList(itemImgList);
+        itemInfo.setItemSpecList(itemSpecList);
+        itemInfo.setItemParams(itemParam);
+
+        return JsonResult.ok(itemInfo);
+    }
+
+    @ApiOperation(value = "查询商品评论等级", notes = "查询商品评论等级", httpMethod = "GET")
+    @GetMapping("commentLevel")
+    public JsonResult commentLevel(
+            @ApiParam(name = "itemId", value = "商品id", required = false) @RequestParam String itemId) {
+
+        if (StringUtils.isBlank(itemId)) {
+            return JsonResult.errorMsg(null);
+        }
+
+        CommentLevelCountsVO countsVO = itemService.queryCommentCounts(itemId);
+
+        return JsonResult.ok(countsVO);
+    }
+
+
+    @ApiOperation(value = "查询商品评论详情", notes = "查询商品评论详情", httpMethod = "GET")
+    @GetMapping("comments")
+    public JsonResult comments(
+            @ApiParam(name = "itemId", value = "商品id", required = true) @RequestParam String itemId,
+            @ApiParam(name = "level", value = "评论等级", required = false) @RequestParam Integer level,
+            @ApiParam(name = "page", value = "查询下一页是第几页", required = false) @RequestParam Integer page,
+            @ApiParam(name = "pageSize", value = "分页的每一页显示的条数", required = false) @RequestParam Integer pageSize) {
+
+        if (StringUtils.isBlank(itemId)) {
+            return JsonResult.errorMsg(null);
+        }
+        // 当前是第几页，没有则表示是第一页
+        if (page == null) {
+            page = 1;
+        }
+        // 没有设置每页条数，则设置默认条数
+        if (pageSize == null) {
+            pageSize = COMMENT_PAGE_SIZE;
+        }
+
+        PagedGridResult result = itemService.queryPagedComments(itemId, level, page, pageSize);
+
+        return JsonResult.ok(result);
     }
 }

@@ -4,6 +4,9 @@ import wiki.laona.pojo.Items;
 import wiki.laona.pojo.ItemsImg;
 import wiki.laona.pojo.ItemsParam;
 import wiki.laona.pojo.ItemsSpec;
+import wiki.laona.pojo.vo.CommentLevelCountsVO;
+import wiki.laona.pojo.vo.ItemCommentVO;
+import wiki.laona.utils.PagedGridResult;
 
 import java.util.List;
 
@@ -41,4 +44,22 @@ public interface ItemService {
      * @return 商品参数
      */
     public ItemsParam queryItemParam(String itemId);
+
+    /**
+     * 查询当前商品的评论等级数量
+     * @param itemId 商品 id
+     * @return 评论数量
+     */
+    public CommentLevelCountsVO queryCommentCounts(String itemId);
+
+    /**
+     * 根据商品id 查询商品的评价（分页）
+     * @param itemId 商品 id
+     * @param level 评论等级
+     * @param page 当前页码
+     * @param pageSize 每页条数
+     *
+     * @return 评价
+     */
+    public PagedGridResult queryPagedComments(String itemId, Integer level, Integer page, Integer pageSize);
 }
