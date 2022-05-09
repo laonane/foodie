@@ -73,15 +73,11 @@ public class ItemsController extends BaseController{
     public JsonResult comments(
             @ApiParam(name = "itemId", value = "商品id", required = true) @RequestParam String itemId,
             @ApiParam(name = "level", value = "评论等级", required = false) @RequestParam(defaultValue = "0") Integer level,
-            @ApiParam(name = "page", value = "查询下一页是第几页", required = false) @RequestParam Integer page,
+            @ApiParam(name = "page", value = "查询下一页是第几页", required = false) @RequestParam(defaultValue = "1") Integer page,
             @ApiParam(name = "pageSize", value = "分页的每一页显示的条数", required = false) @RequestParam Integer pageSize) {
 
         if (StringUtils.isBlank(itemId)) {
             return JsonResult.errorMsg(null);
-        }
-        // 当前是第几页，没有则表示是第一页
-        if (page == null) {
-            page = 1;
         }
         // 没有设置每页条数，则设置默认条数
         if (pageSize == null) {
@@ -107,10 +103,6 @@ public class ItemsController extends BaseController{
 
         if (StringUtils.isBlank(keywords)) {
             return JsonResult.errorMsg(null);
-        }
-        // 当前是第几页，没有则表示是第一页
-        if (page == null) {
-            page = 1;
         }
         // 没有设置每页条数，则设置默认条数
         if (pageSize == null) {
