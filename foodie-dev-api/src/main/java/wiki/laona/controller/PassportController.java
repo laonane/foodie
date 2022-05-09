@@ -76,7 +76,7 @@ public class PassportController {
         // 5. 注册用户
         Users userResult = userService.createUser(userBo);
         // 去除隐私信息
-        setNullProperty(userResult);
+        userResult = setNullProperty(userResult);
 
         // 6. 保存 cookie
         CookieUtils.setCookie(req, resp, "user", JsonUtils.objectToJson(userResult), true);
@@ -115,7 +115,7 @@ public class PassportController {
             return JsonResult.errorMsg("用户名或密码不正确");
         }
 
-        setNullProperty(userResult);
+        userResult = setNullProperty(userResult);
 
         // 用户信息设置到 cookie
         CookieUtils.setCookie(req, resp, "user", JsonUtils.objectToJson(userResult), true);
