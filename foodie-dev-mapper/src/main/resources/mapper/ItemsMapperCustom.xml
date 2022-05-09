@@ -28,4 +28,43 @@
         AND ic.comment_level = #{paramsMap.level}
       </if>
   </select>
+  
+  <!-- k: 默认，代表默认排序，根据name进行排序 -->
+  <!-- c: 根据销量排序 -->
+  <!-- p: 根据价格排序 -->
+  <select id="searchItems" parameterType="map" resultType="wiki.laona.pojo.vo.SearchItemVO">
+    SELECT i.id           as itemId,
+           i.item_name    as itemName,
+           i.sell_counts  as sellCounts,
+           ii.url         as imgUrl,
+           tempSpec.price as price
+    FROM items i
+           LEFT JOIN
+             items_img ii
+           on i.id = ii.item_id
+           LEFT JOIN
+             (
+               SELECT item_id,
+                      MIN(price_discount) as price
+               FROM items_spec
+               GROUP BY item_id
+             ) tempSpec
+            ON i.id = tempSpec.item_id
+    where ii.is_main = 1
+      <if test=" paramsMap.keywords != null and paramsMap.keywords != '' ">
+        AND i.item_name like '%${paramsMap.keywords}%'
+      </if>
+      order by
+      <choose>
+        <when test=" paramsMap.sort == &quot;c&quot; ">
+          i.sell_counts desc
+        </when>
+        <when test=" paramsMap.sort == &quot;p&quot; ">
+          tempSpec.price_discount desc
+        </when>
+        <otherwise>
+          i.item_name asc
+        </otherwise>
+      </choose>
+  </select>
 </mapper>

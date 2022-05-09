@@ -5,7 +5,6 @@ import wiki.laona.pojo.ItemsImg;
 import wiki.laona.pojo.ItemsParam;
 import wiki.laona.pojo.ItemsSpec;
 import wiki.laona.pojo.vo.CommentLevelCountsVO;
-import wiki.laona.pojo.vo.ItemCommentVO;
 import wiki.laona.utils.PagedGridResult;
 
 import java.util.List;
@@ -19,6 +18,7 @@ public interface ItemService {
 
     /**
      * 根据商品 id 查询商品详情
+     *
      * @param itemId 商品 id
      * @return 商品详情
      */
@@ -26,6 +26,7 @@ public interface ItemService {
 
     /**
      * 根据商品 id 查询商品图片列表
+     *
      * @param itemId 商品 id
      * @return 商品图片列表
      */
@@ -33,6 +34,7 @@ public interface ItemService {
 
     /**
      * 根据商品 id 查询商品规格
+     *
      * @param itemId 商品 id
      * @return 商品规格
      */
@@ -40,6 +42,7 @@ public interface ItemService {
 
     /**
      * 根据商品 id 查询商品参数
+     *
      * @param itemId 商品 id
      * @return 商品参数
      */
@@ -47,6 +50,7 @@ public interface ItemService {
 
     /**
      * 查询当前商品的评论等级数量
+     *
      * @param itemId 商品 id
      * @return 评论数量
      */
@@ -54,12 +58,25 @@ public interface ItemService {
 
     /**
      * 根据商品id 查询商品的评价（分页）
-     * @param itemId 商品 id
-     * @param level 评论等级
-     * @param page 当前页码
-     * @param pageSize 每页条数
      *
+     * @param itemId   商品 id
+     * @param level    评论等级
+     * @param page     当前页码
+     * @param pageSize 每页条数
      * @return 评价
      */
     public PagedGridResult queryPagedComments(String itemId, Integer level, Integer page, Integer pageSize);
+
+    /**
+     * 搜索商品列表
+     *
+     * @param keywords 搜索关键字
+     * @param sort     排序规则：k: 默认，代表默认排序，根据name进行排序
+     *                 c: 根据销量排序
+     *                 p: 根据价格排序
+     * @param page     当前页码
+     * @param pageSize 每页条数
+     * @return 商品列表
+     */
+    public PagedGridResult searchItems(String keywords, String sort, Integer page, Integer pageSize);
 }

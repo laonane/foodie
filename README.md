@@ -170,3 +170,8 @@ public class ServiceLogAspect {
 
 - 商品评论详情
 - 商品评论分页
+- 评论用户信息脱敏
+
+#### 10. 商品搜索
+
+- 排序规则

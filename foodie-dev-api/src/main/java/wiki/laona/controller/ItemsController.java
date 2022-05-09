@@ -95,4 +95,29 @@ public class ItemsController extends BaseController{
 
         return JsonResult.ok(result);
     }
+
+
+    @ApiOperation(value = "搜索商品列表", notes = "搜索商品列表", httpMethod = "GET")
+    @GetMapping("/search")
+    public JsonResult comments(
+            @ApiParam(name = "keywords", value = "搜索关键字", required = true) @RequestParam String keywords,
+            @ApiParam(name = "sort", value = "排序规则", required = false) @RequestParam(defaultValue = "k") String sort,
+            @ApiParam(name = "page", value = "查询下一页是第几页", required = false) @RequestParam(defaultValue = "1") Integer page,
+            @ApiParam(name = "pageSize", value = "分页的每一页显示的条数", required = false) @RequestParam Integer pageSize) {
+
+        if (StringUtils.isBlank(keywords)) {
+            return JsonResult.errorMsg(null);
+        }
+        // 当前是第几页，没有则表示是第一页
+        if (page == null) {
+            page = 1;
+        }
+        // 没有设置每页条数，则设置默认条数
+        if (pageSize == null) {
+            pageSize = PAGE_SIZE;
+        }
+        PagedGridResult result = itemService.searchItems(keywords, sort, page, pageSize);
+
+        return JsonResult.ok(result);
+    }
 }

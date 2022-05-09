@@ -12,6 +12,7 @@ import wiki.laona.mapper.*;
 import wiki.laona.pojo.*;
 import wiki.laona.pojo.vo.CommentLevelCountsVO;
 import wiki.laona.pojo.vo.ItemCommentVO;
+import wiki.laona.pojo.vo.SearchItemVO;
 import wiki.laona.service.ItemService;
 import wiki.laona.utils.DesensitizationUtil;
 import wiki.laona.utils.PagedGridResult;
@@ -142,5 +143,18 @@ public class ItemServiceImpl implements ItemService {
         grid.setTotal(pageInfo.getPages());
         grid.setRecords(pageInfo.getTotal());
         return grid;
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
+    @Override
+    public PagedGridResult searchItems(String keywords, String sort, Integer page, Integer pageSize) {
+        Map<String, Object> paramsMap = new HashMap<>(1 << 4);
+        paramsMap.put("keywords", keywords);
+        paramsMap.put("sort", sort);
+
+        PageHelper.startPage(page, pageSize);
+        List<SearchItemVO> list = itemsMapperCustom.searchItems(paramsMap);
+
+        return setterPageGrid(list, page);
     }
 }

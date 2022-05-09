@@ -8,7 +8,11 @@ package wiki.laona.controller;
 public class BaseController {
 
     /**
-     * 通用的每页的条数
+     * 评论每页的条数
      */
     public static final Integer COMMENT_PAGE_SIZE = 10;
+    /**
+     * 通用每页条数
+     */
+    public static final Integer PAGE_SIZE = 20;
 }
