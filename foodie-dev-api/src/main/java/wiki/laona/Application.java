@@ -35,6 +35,7 @@ public class Application {
                             "Application Jeecg-Boot is running! Access URLs:\n\t" +
                             "Local: \t\thttp://localhost:" + port + path + "/\n\t" +
                             "External: \thttp://" + ip + ":" + port + path + "/\n\t" +
+                            "前端地址: \thttp://" + ip + ":8080/foodie-shop/\n\t" +
                             "Swagger文档: \thttp://" + ip + ":" + port + path + "/doc.html\n" +
                             "----------------------------------------------------------");
         }catch (Exception e) {
