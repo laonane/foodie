@@ -13,6 +13,7 @@ import wiki.laona.pojo.*;
 import wiki.laona.pojo.vo.CommentLevelCountsVO;
 import wiki.laona.pojo.vo.ItemCommentVO;
 import wiki.laona.service.ItemService;
+import wiki.laona.utils.DesensitizationUtil;
 import wiki.laona.utils.PagedGridResult;
 
 import java.util.HashMap;
@@ -120,7 +121,9 @@ public class ItemServiceImpl implements ItemService {
 
         PageHelper.startPage(page, pageSize);
         List<ItemCommentVO> list = itemsMapperCustom.queryItemComments(paramsMap);
-
+        for (ItemCommentVO vo : list) {
+            vo.setNickname(DesensitizationUtil.commonDisplay(vo.getNickname()));
+        }
         return setterPageGrid(list, page);
     }
 
