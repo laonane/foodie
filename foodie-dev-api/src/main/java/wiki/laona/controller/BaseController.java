@@ -15,4 +15,16 @@ public class BaseController {
      * 通用每页条数
      */
     public static final Integer PAGE_SIZE = 20;
+    /**
+     * 收货人姓名的最大长度
+     */
+    public static final Integer MAX_LEN_OF_RECEIVER_NAME = 12;
+    /**
+     * 手机号长度
+     */
+    public static final Integer LEN_OF_PHONE_NUM = 11;
+    /**
+     * 成功回调码
+     */
+    public static final Integer success_code = 200;
 }

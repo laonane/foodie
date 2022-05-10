@@ -183,5 +183,9 @@ public class ServiceLogAspect {
 - 常见解决方案
 - Cookies 购物车实现
 - 未登录 -> 登录购物车处理
-
 - 渲染（刷新购物车）
+- 删除购物车
+
+#### 12. 确认订单
+
+- 
