@@ -27,4 +27,10 @@ public interface ItemsMapperCustom extends MyMapper<Items> {
      */
     public List<SearchItemVO> searchItems(@Param("paramsMap") Map<String, Object> map);
 
+    /**
+     * 搜索商品列表（按照三级分类 id）
+     * @param map 参数
+     * @return 商品列表
+     */
+    public List<SearchItemVO> searchItemsByThirdCat(@Param("paramsMap") Map<String, Object> map);
 }
