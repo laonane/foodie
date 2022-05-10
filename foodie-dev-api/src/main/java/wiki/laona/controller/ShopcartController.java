@@ -40,4 +40,20 @@ public class ShopcartController {
         return JsonResult.ok();
     }
 
+
+    @ApiOperation(value = "删除购物车的商品", notes = "删除购物车的商品", httpMethod = "POST")
+    @PostMapping("/del")
+    public JsonResult del(@RequestParam String userId,
+                          @RequestParam String itemSpecId,
+                          HttpServletRequest request,
+                          HttpServletResponse response) {
+        if (StringUtils.isBlank(userId) || StringUtils.isBlank(itemSpecId)) {
+            return  JsonResult.errorMsg("参数不能为空");
+        }
+
+        // TODO 前端用户在登录的情况下，删除购物车的商品，同时删除 Redis 缓存中的商品
+
+        return JsonResult.ok();
+    }
+
 }
