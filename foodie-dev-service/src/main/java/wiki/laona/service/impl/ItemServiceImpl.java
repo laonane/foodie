@@ -13,13 +13,12 @@ import wiki.laona.pojo.*;
 import wiki.laona.pojo.vo.CommentLevelCountsVO;
 import wiki.laona.pojo.vo.ItemCommentVO;
 import wiki.laona.pojo.vo.SearchItemVO;
+import wiki.laona.pojo.vo.ShopcartVO;
 import wiki.laona.service.ItemService;
 import wiki.laona.utils.DesensitizationUtil;
 import wiki.laona.utils.PagedGridResult;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author laona
@@ -169,5 +168,16 @@ public class ItemServiceImpl implements ItemService {
         List<SearchItemVO> list = itemsMapperCustom.searchItemsByThirdCat(paramsMap);
 
         return setterPageGrid(list, page);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
+    @Override
+    public List<ShopcartVO> queryItemsBySpecIds(String specIds) {
+
+        String[] ids = specIds.split(",");
+        List<String> specIdList = new ArrayList<>();
+        Collections.addAll(specIdList, ids);
+
+        return itemsMapperCustom.queryItemsBySpecIds(specIdList);
     }
 }

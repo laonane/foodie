@@ -6,6 +6,7 @@ import wiki.laona.my.mapper.MyMapper;
 import wiki.laona.pojo.Items;
 import wiki.laona.pojo.vo.ItemCommentVO;
 import wiki.laona.pojo.vo.SearchItemVO;
+import wiki.laona.pojo.vo.ShopcartVO;
 
 import java.util.List;
 import java.util.Map;
@@ -33,4 +34,13 @@ public interface ItemsMapperCustom extends MyMapper<Items> {
      * @return 商品列表
      */
     public List<SearchItemVO> searchItemsByThirdCat(@Param("paramsMap") Map<String, Object> map);
+
+
+    /**
+     * 通过规格id查询商品信息
+     * @param list 参数
+     * @return 商品列表
+     */
+    public List<ShopcartVO> queryItemsBySpecIds(@Param("paramsList") List<?> list);
+
 }

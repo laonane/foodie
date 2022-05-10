@@ -12,6 +12,7 @@ import wiki.laona.pojo.ItemsParam;
 import wiki.laona.pojo.ItemsSpec;
 import wiki.laona.pojo.vo.CommentLevelCountsVO;
 import wiki.laona.pojo.vo.ItemInfoVO;
+import wiki.laona.pojo.vo.ShopcartVO;
 import wiki.laona.service.ItemService;
 import wiki.laona.utils.JsonResult;
 import wiki.laona.utils.PagedGridResult;
@@ -132,5 +133,25 @@ public class ItemsController extends BaseController{
         PagedGridResult result = itemService.searchItemsByThirdCat(catId, sort, page, pageSize);
 
         return JsonResult.ok(result);
+    }
+
+
+    /**
+     * 用户用户长时间未登录网站，刷新购物车的数据（主要是商品价格），类似于京东淘宝
+     */
+    @ApiOperation(value = "根据商品ids查找最新的商品数据", notes = "根据商品ids查找最新的商品数据", httpMethod = "GET")
+    @GetMapping("/refresh")
+    public JsonResult refresh(
+            @ApiParam(name = "itemSpecIds", value = "拼接的商品规格ids", required = true, example = "1001,1003,1005")
+            @RequestParam String itemSpecIds) {
+
+        if (StringUtils.isBlank(itemSpecIds)) {
+            // 没有正确内容就是啥都没有
+            return JsonResult.ok();
+        }
+
+        List<ShopcartVO> shopcartList = itemService.queryItemsBySpecIds(itemSpecIds);
+
+        return JsonResult.ok(shopcartList);
     }
 }

@@ -5,6 +5,7 @@ import wiki.laona.pojo.ItemsImg;
 import wiki.laona.pojo.ItemsParam;
 import wiki.laona.pojo.ItemsSpec;
 import wiki.laona.pojo.vo.CommentLevelCountsVO;
+import wiki.laona.pojo.vo.ShopcartVO;
 import wiki.laona.utils.PagedGridResult;
 
 import java.util.List;
@@ -92,4 +93,12 @@ public interface ItemService {
      * @return 商品列表
      */
     public PagedGridResult searchItemsByThirdCat(Integer catId, String sort, Integer page, Integer pageSize);
+
+    /**
+     * 根据规格ids查询最新购物车中商品数据（用于渲染刷新购物车中的商品数据）
+     *
+     * @param specIds 拼接的规格ids
+     * @return 购物车中的商品数据
+     */
+    public List<ShopcartVO> queryItemsBySpecIds(String specIds);
 }
