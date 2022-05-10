@@ -37,7 +37,7 @@ public class HelloController {
         return "hello world!";
     }
 
-    @ApiOperation(value = "设置session", tags = {"设置session"}, httpMethod = "get")
+    @ApiOperation(value = "设置session", tags = {"设置session"}, httpMethod = "GET")
     @GetMapping("setSession")
     public JsonResult setSession(HttpServletRequest request) {
         HttpSession session = request.getSession();

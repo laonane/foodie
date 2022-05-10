@@ -83,7 +83,7 @@ public class PassportController {
         // 6. 保存 cookie
         CookieUtils.setCookie(req, resp, "user", JsonUtils.objectToJson(userResult), true);
 
-        // TODO 生成用户token，存入redis会话
+        // TODO 生成用户token，存入 Redis 会话
         // TODO 同步购物车数据
 
         return JsonResult.ok();
