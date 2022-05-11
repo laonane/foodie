@@ -5,17 +5,21 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import wiki.laona.enums.OrderStatusEnum;
 import wiki.laona.enums.PayMethod;
 import wiki.laona.pojo.bo.SubmitOrderBO;
+import wiki.laona.pojo.vo.MerchantOrdersVO;
+import wiki.laona.pojo.vo.OrderVO;
 import wiki.laona.service.OrderService;
 import wiki.laona.utils.JsonResult;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
 /**
@@ -33,30 +37,56 @@ public class OrdersController extends BaseController {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     @ApiOperation(value = "用户下单", notes = "用户下单", httpMethod = "POST")
     @PostMapping("/create")
-    public JsonResult list(@RequestBody SubmitOrderBO submitOrderBO,
-                           HttpServletRequest request,
-                           HttpServletResponse response) {
+    public JsonResult list(@RequestBody SubmitOrderBO submitOrderBO) {
 
         if (!Objects.equals(submitOrderBO.getPayMethod(), PayMethod.WEIXIN.type)
-                && !Objects.equals(submitOrderBO.getPayMethod(), PayMethod.ALIPAY.type)){
+                && !Objects.equals(submitOrderBO.getPayMethod(), PayMethod.ALIPAY.type)) {
 
             return JsonResult.errorMsg("支付方式不支持");
         }
-
-        logger.info("用户下单：{}", submitOrderBO);
+        // logger.info("用户下单：{}", submitOrderBO);
 
         // 1. 创建订单
-        String orderId = orderService.createOrder(submitOrderBO);
+        OrderVO orderVO = orderService.createOrder(submitOrderBO);
+        String orderId = orderVO.getOrderId();
 
-        // 2. 创建爱你订单后，移除购物车中已结算（已提交）的商品
+        // 2. 创建订单后，移除购物车中已结算（已提交）的商品
         // TODO 整合 redis之后，移除购物车已经结算的订单数据
         // CookieUtils.setCookie(request, response, FOODIE_SHOPCART, "");
 
         // 3. 向支付中心发送当前订单，创建支付中心的订单数据
-        logger.info("这是已经完成了-----");
+        MerchantOrdersVO merchantOrdersVO = orderVO.getMerchantOrdersVO();
+        merchantOrdersVO.setReturnUrl(RETURN_URL);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("imoocUserId", "imooc");
+        headers.add("password", "imooc");
+
+        HttpEntity<MerchantOrdersVO> httpEntity = new HttpEntity<>(merchantOrdersVO, headers);
+
+        ResponseEntity<JsonResult> responseEntity
+                = restTemplate.postForEntity(PAYMENT_URL, httpEntity, JsonResult.class);
+        JsonResult paymentResult = responseEntity.getBody();
+        if (ObjectUtils.isEmpty(paymentResult) || !ObjectUtils.nullSafeEquals(paymentResult.getStatus(), SUCCESS_CODE)) {
+            return JsonResult.errorMsg("支付中心订单创建失败，请联系管理员");
+        }
+
         return JsonResult.ok(orderId);
+    }
+
+    @ApiOperation(value = "更改订单状态为已支付，待发送", notes = "更改订单状态为已支付，待发送", httpMethod = "POST")
+    @PostMapping("notifyMerchantOrderPaid")
+    public Integer notifyMerchantOrderPaid(String merchantOrderId) {
+
+        orderService.updateOrderStatus(merchantOrderId, OrderStatusEnum.WAIT_DELIVER.type);
+
+        return HttpStatus.OK.value();
     }
 
 }

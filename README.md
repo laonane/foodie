@@ -189,3 +189,15 @@ public class ServiceLogAspect {
 #### 12. 订单
 
 - 确认订单
+- 支付流程
+- 订单回调
+- 支付中心订单测试
+```shell
+# 修改: merchantOrderId\merchantUserId 即可
+curl --location --request POST 'http://payment.t.mukewang.com/foodie-payment/payment/getPaymentCenterOrderInfo?merchantOrderId=2205120DK1RGXZTC&merchantUserId=220511G4M62YZ0X4' --header 'imoocUserId: imooc' --header 'password: imooc'
+
+
+curl --location --request POST 'http://payment.t.mukewang.com/foodie-payment/payment/getPaymentCenterOrderInfo?merchantOrderId=2205120DK1RGXZTC&merchantUserId=220511G4M62YZ0X4' \
+--header 'imoocUserId: imooc' \
+--header 'password: imooc'
+```

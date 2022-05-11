@@ -26,9 +26,20 @@ public class BaseController {
     /**
      * 成功回调码
      */
-    public static final Integer success_code = 200;
+    public static final Integer SUCCESS_CODE = 200;
     /**
      * 购物车cookie名
      */
     public static final String FOODIE_SHOPCART = "shopcart";
+    /**
+     * 回调通知url
+     * <p>
+     * 流程： 微信支付成功 -> 支付中信 -> 电商平台
+     */
+    public static final String RETURN_URL = "http://localhost:8088/orders/notifyMerchantOrderPaid";
+
+    /**
+     * 支付中心的调用地址(生产环境)
+     */
+    public static final String PAYMENT_URL = "http://payment.t.mukewang.com/foodie-payment/payment/createMerchantOrder";
 }
