@@ -12,6 +12,7 @@ public interface OrderService {
     /**
      * 创建订单信息
      * @param submitOrderBO 订单信息
+     * @return 订单号
      */
-    public void createOrder(SubmitOrderBO submitOrderBO);
+    public String createOrder(SubmitOrderBO submitOrderBO);
 }

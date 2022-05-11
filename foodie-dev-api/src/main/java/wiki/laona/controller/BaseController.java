@@ -27,4 +27,8 @@ public class BaseController {
      * 成功回调码
      */
     public static final Integer success_code = 200;
+    /**
+     * 购物车cookie名
+     */
+    public static final String FOODIE_SHOPCART = "shopcart";
 }
