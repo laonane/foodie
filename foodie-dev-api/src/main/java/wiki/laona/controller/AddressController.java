@@ -18,7 +18,7 @@ import java.util.List;
  * @description 用户地址controller
  * @create 2022-05-10 22:10
  **/
-@Api(value = "地址相关", tags = {"地址相关的api接口"})
+@Api(value = "地址相关接口", tags = {"地址相关的api接口"})
 @RestController
 @RequestMapping("/address")
 public class AddressController extends BaseController {

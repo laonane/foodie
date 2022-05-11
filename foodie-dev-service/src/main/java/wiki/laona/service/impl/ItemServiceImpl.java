@@ -2,12 +2,14 @@ package wiki.laona.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 import wiki.laona.enums.CommentLevel;
+import wiki.laona.enums.YesOrNo;
 import wiki.laona.mapper.*;
 import wiki.laona.pojo.*;
 import wiki.laona.pojo.vo.CommentLevelCountsVO;
@@ -179,5 +181,45 @@ public class ItemServiceImpl implements ItemService {
         Collections.addAll(specIdList, ids);
 
         return itemsMapperCustom.queryItemsBySpecIds(specIdList);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
+    @Override
+    public ItemsSpec queryItemSpecById(String itemSpecId) {
+        return itemsSpecMapper.selectByPrimaryKey(itemSpecId);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
+    @Override
+    public String queryItemMainImgById(String itemId) {
+
+        ItemsImg itemImg = new ItemsImg();
+        itemImg.setItemId(itemId);
+        itemImg.setIsMain(YesOrNo.YES.type);
+
+        ItemsImg result = itemsImgMapper.selectOne(itemImg);
+
+        return ObjectUtils.isNotEmpty(result) ? result.getUrl() : "";
+    }
+
+    /**
+     * synchronized: 不推荐是用，集群下无用，性能低
+     * 锁数据库：不推荐，导致数据库性能低下
+     * 分布式锁：zookeeper  redis
+     *
+     * ---
+     * 这里使用数据库锁进行
+     */
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public void decreaseItemSpecStock(String specId, int buyCounts) {
+        // 1. 查询库存，
+
+        // 2. 判断库存，是否能够减少
+
+        int result = itemsMapperCustom.decreaseItemSpecStock(specId, buyCounts);
+        if (result != 1) {
+            throw new RuntimeException("订单创建失败，原因：库存不足");
+        }
     }
 }

@@ -128,4 +128,17 @@
                 #{specId}
             </foreach>
     </select>
+
+    <!--
+        乐观锁解决减少库存
+    -->
+    <update id="decreaseItemSpecStock" parameterType="map">
+        update
+            items_spec
+        set
+            stock = stock - #{pendingConuts}
+        where
+            id = ${specId}
+        and stock >= #{pendingConuts}
+    </update>
 </mapper>
