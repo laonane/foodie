@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import tk.mybatis.spring.annotation.MapperScan;
 
 import java.net.InetAddress;
@@ -18,6 +19,7 @@ import java.net.InetAddress;
 @SpringBootApplication
 @MapperScan(basePackages = {"wiki.laona.mapper"})
 @ComponentScan(basePackages = {"wiki.laona", "org.n3r.idworker"})
+@EnableScheduling
 public class Application {
 
     public static void main(String[] args) {

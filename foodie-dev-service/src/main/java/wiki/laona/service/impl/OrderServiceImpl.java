@@ -1,6 +1,9 @@
 package wiki.laona.service.impl;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.n3r.idworker.Sid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -17,8 +20,10 @@ import wiki.laona.pojo.vo.OrderVO;
 import wiki.laona.service.AddressService;
 import wiki.laona.service.ItemService;
 import wiki.laona.service.OrderService;
+import wiki.laona.utils.DateUtil;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author laona
@@ -27,6 +32,8 @@ import java.util.Date;
  **/
 @Service
 public class OrderServiceImpl implements OrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Autowired
     private Sid sid;
@@ -163,8 +170,44 @@ public class OrderServiceImpl implements OrderService {
         orderStatusMapper.updateByPrimaryKeySelective(paidStatus);
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
     @Override
     public OrderStatus queryOrderStatusInfo(String orderId) {
         return orderStatusMapper.selectByPrimaryKey(orderId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public void closeOrder() {
+
+        // 查询所有未之父订单，判断时间是否超时（1天）, 超时则关闭交易
+        OrderStatus orderStatus = new OrderStatus();
+        orderStatus.setOrderStatus(OrderStatusEnum.WAIT_PAY.type);
+        List<OrderStatus> list = orderStatusMapper.select(orderStatus);
+        for (OrderStatus os : list) {
+            // 获得订单创建时间
+            Date createdTime = os.getCreatedTime();
+            int daysBetween = DateUtil.daysBetween(createdTime, new Date());
+            if (daysBetween >= 1) {
+                // 超过1天，关闭订单
+                doCloseOrder(os.getOrderId());
+            }
+        }
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    void doCloseOrder(String orderId){
+
+        OrderStatus closeOrderStatus = orderStatusMapper.selectByPrimaryKey(orderId);
+
+        if (ObjectUtils.isEmpty(orderId)) {
+            logger.error("当前订单不存在: {}", orderId);
+            return;
+        }
+
+        closeOrderStatus.setOrderStatus(OrderStatusEnum.CLOSE.type);
+        closeOrderStatus.setCloseTime(new Date());
+        orderStatusMapper.updateByPrimaryKeySelective(closeOrderStatus);
     }
 }
