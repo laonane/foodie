@@ -2,6 +2,7 @@ package wiki.laona.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import wiki.laona.enums.OrderStatusEnum;
 import wiki.laona.enums.PayMethod;
+import wiki.laona.pojo.OrderStatus;
 import wiki.laona.pojo.bo.SubmitOrderBO;
 import wiki.laona.pojo.vo.MerchantOrdersVO;
 import wiki.laona.pojo.vo.OrderVO;
@@ -49,7 +51,6 @@ public class OrdersController extends BaseController {
 
             return JsonResult.errorMsg("支付方式不支持");
         }
-        // logger.info("用户下单：{}", submitOrderBO);
 
         // 1. 创建订单
         OrderVO orderVO = orderService.createOrder(submitOrderBO);
@@ -62,6 +63,8 @@ public class OrdersController extends BaseController {
         // 3. 向支付中心发送当前订单，创建支付中心的订单数据
         MerchantOrdersVO merchantOrdersVO = orderVO.getMerchantOrdersVO();
         merchantOrdersVO.setReturnUrl(RETURN_URL);
+        // 为了方便测试购买，所有的订单金额都写成 0.01 元
+        merchantOrdersVO.setAmount(1);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -87,6 +90,19 @@ public class OrdersController extends BaseController {
         orderService.updateOrderStatus(merchantOrderId, OrderStatusEnum.WAIT_DELIVER.type);
 
         return HttpStatus.OK.value();
+    }
+
+
+    @ApiOperation(value = "发起支付请求后查询当前订单状态", notes = "发起支付请求后查询当前订单状态", httpMethod = "POST")
+    @PostMapping("getPaidOrderInfo")
+    public JsonResult getPaidOrderInfo(String orderId){
+        if (StringUtils.isBlank(orderId)) {
+            return JsonResult.errorMsg("订单不存在");
+        }
+
+        OrderStatus orderStatus = orderService.queryOrderStatusInfo(orderId);
+
+        return JsonResult.ok(orderStatus);
     }
 
 }

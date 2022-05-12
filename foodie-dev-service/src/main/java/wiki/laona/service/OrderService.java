@@ -1,5 +1,6 @@
 package wiki.laona.service;
 
+import wiki.laona.pojo.OrderStatus;
 import wiki.laona.pojo.bo.SubmitOrderBO;
 import wiki.laona.pojo.vo.OrderVO;
 
@@ -19,10 +20,20 @@ public interface OrderService {
     public OrderVO createOrder(SubmitOrderBO submitOrderBO);
 
     /**
-     * 根据订单id更新订单状态
+     * 根据订单id修改订单状态
      *
      * @param orderId     订单id
      * @param orderStatus 订单状态
      */
     public void updateOrderStatus(String orderId, Integer orderStatus);
+
+
+    /**
+     * 根据订单id查询订单状态
+     *
+     * @param orderId 订单id
+     * @return 订单状态
+     */
+    public OrderStatus queryOrderStatusInfo(String orderId);
+
 }

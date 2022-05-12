@@ -197,7 +197,8 @@ public class ServiceLogAspect {
 curl --location --request POST 'http://payment.t.mukewang.com/foodie-payment/payment/getPaymentCenterOrderInfo?merchantOrderId=2205120DK1RGXZTC&merchantUserId=220511G4M62YZ0X4' --header 'imoocUserId: imooc' --header 'password: imooc'
 
 
-curl --location --request POST 'http://payment.t.mukewang.com/foodie-payment/payment/getPaymentCenterOrderInfo?merchantOrderId=2205120DK1RGXZTC&merchantUserId=220511G4M62YZ0X4' \
+curl --location --request POST 'http://payment.t.mukewang.com/foodie-payment/payment/getPaymentCenterOrderInfo?merchantOrderId=220512A9BFT3F2RP&merchantUserId=220511AYF42TCWSW' \
 --header 'imoocUserId: imooc' \
 --header 'password: imooc'
 ```
+- 支付成功后的回调
