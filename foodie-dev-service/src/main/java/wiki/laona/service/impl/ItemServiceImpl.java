@@ -2,7 +2,6 @@ package wiki.laona.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -199,7 +198,7 @@ public class ItemServiceImpl implements ItemService {
 
         ItemsImg result = itemsImgMapper.selectOne(itemImg);
 
-        return ObjectUtils.isNotEmpty(result) ? result.getUrl() : "";
+        return result != null ? result.getUrl() : "";
     }
 
     /**

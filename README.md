@@ -204,3 +204,10 @@ curl --location --request POST 'http://payment.t.mukewang.com/foodie-payment/pay
 - 支付成功后的回调
 - 定时任务关闭超时订单
 
+#### 13. 用户信息
+
+- 查询
+- 修改
+- 图片上传
+
+####  

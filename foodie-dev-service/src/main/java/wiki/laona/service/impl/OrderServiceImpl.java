@@ -1,6 +1,6 @@
 package wiki.laona.service.impl;
 
-import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.n3r.idworker.Sid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -201,7 +201,7 @@ public class OrderServiceImpl implements OrderService {
 
         OrderStatus closeOrderStatus = orderStatusMapper.selectByPrimaryKey(orderId);
 
-        if (ObjectUtils.isEmpty(orderId)) {
+        if (StringUtils.isBlank(orderId)) {
             logger.error("当前订单不存在: {}", orderId);
             return;
         }

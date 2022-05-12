@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 @Api(value = "注册登录", tags = {"用于注册登录的相关接口"})
 @RestController
 @RequestMapping("passport")
-public class PassportController {
+public class PassportController extends BaseController{
 
     @Autowired
     private UserService userService;
@@ -81,7 +81,7 @@ public class PassportController {
         userResult = setNullProperty(userResult);
 
         // 6. 保存 cookie
-        CookieUtils.setCookie(req, resp, "user", JsonUtils.objectToJson(userResult), true);
+        CookieUtils.setCookie(req, resp, USER_INFO, JsonUtils.objectToJson(userResult), true);
 
         // TODO 生成用户token，存入 Redis 会话
         // TODO 同步购物车数据

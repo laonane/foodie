@@ -1,6 +1,7 @@
 package wiki.laona.service.center;
 
 import wiki.laona.pojo.Users;
+import wiki.laona.pojo.bo.CenterUsersBO;
 
 /**
  * @author laona
@@ -16,4 +17,13 @@ public interface CenterUserService {
      * @return 用户信息
      */
     public Users queryUserInfo(String userId);
+
+    /**
+     * 修改用户信息
+     *
+     * @param userId        userId
+     * @param centerUsersBO centerUsersBO
+     * @return 用户信息
+     */
+    public Users updateUserInfo(String userId, CenterUsersBO centerUsersBO);
 }

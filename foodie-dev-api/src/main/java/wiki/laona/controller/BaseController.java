@@ -1,5 +1,7 @@
 package wiki.laona.controller;
 
+import java.io.File;
+
 /**
  * @author laona
  * @description 通用 controller
@@ -28,6 +30,10 @@ public class BaseController {
      */
     public static final Integer SUCCESS_CODE = 200;
     /**
+     * 用户cookie名
+     */
+    public static final String USER_INFO = "user";
+    /**
      * 购物车cookie名
      */
     public static final String FOODIE_SHOPCART = "shopcart";
@@ -37,9 +43,14 @@ public class BaseController {
      * 流程： 微信支付成功 -> 支付中信 -> 电商平台
      */
     public static final String RETURN_URL = "http://5afk4s.natappfree.cc/orders/notifyMerchantOrderPaid";
-
     /**
      * 支付中心的调用地址(生产环境)
      */
     public static final String PAYMENT_URL = "http://payment.t.mukewang.com/foodie-payment/payment/createMerchantOrder";
+    /**
+     * 用户上传头像位置
+     * File.separator 文件分隔符(自适应不同系统)
+     */
+    public static final String IMAGE_USER_FACE_LOCATION
+            = String.format("E:%sfoodieUpload%simages", File.separator, File.separator);
 }
