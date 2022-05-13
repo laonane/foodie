@@ -16,8 +16,10 @@ import org.springframework.web.multipart.MultipartFile;
 import wiki.laona.controller.BaseController;
 import wiki.laona.pojo.Users;
 import wiki.laona.pojo.bo.CenterUsersBO;
+import wiki.laona.resource.FileUpload;
 import wiki.laona.service.center.CenterUserService;
 import wiki.laona.utils.CookieUtils;
+import wiki.laona.utils.DateUtil;
 import wiki.laona.utils.JsonResult;
 import wiki.laona.utils.JsonUtils;
 
@@ -45,6 +47,8 @@ public class CenterUserController extends BaseController {
 
     @Autowired
     private Sid sid;
+    @Autowired
+    private FileUpload fileUpload;
 
     @Autowired
     private CenterUserService centerUserService;
@@ -66,7 +70,7 @@ public class CenterUserController extends BaseController {
         Users userResult = centerUserService.updateUserInfo(userId, centerUsersBO);
         userResult = setNullProperty(userResult);
 
-        CookieUtils.setCookie(request, response, USER_INFO, JsonUtils.objectToJson(userResult));
+        CookieUtils.setCookie(request, response, USER_INFO, JsonUtils.objectToJson(userResult),true);
 
         // TODO 后需要修改，增加令牌token，会整合进redis，分布式会话
 
@@ -118,11 +122,11 @@ public class CenterUserController extends BaseController {
                                  @ApiParam(name = "file", value = "用户头像", required = true) MultipartFile file,
                                  HttpServletRequest request,
                                  HttpServletResponse response) {
-
         // 头像保存的地址
-        String fileSpace = IMAGE_USER_FACE_LOCATION + File.separator;
+        // String fileSpace = IMAGE_USER_FACE_LOCATION + File.separator;
+        String fileSpace = fileUpload.getImageUserFaceLocation();
         // 在路径上为每一个用户增加一个userid，用于区分不同用户上传
-        String uploadPathPrefix = File.separator + userId;
+        String uploadPathPrefix = userId;
 
         // 开始上传
         if (file != null) {
@@ -136,7 +140,7 @@ public class CenterUserController extends BaseController {
                     String[] fileNameArr = originalFilename.split("\\.");
 
                     String suffix = fileNameArr[fileNameArr.length - 1];
-
+                    // 格式判断
                     if (!StringUtils.equalsAnyIgnoreCase(suffix, "png", "jpg", "jpeg")) {
                         return JsonResult.errorMsg("图片格式不正确!");
                     }
@@ -146,9 +150,10 @@ public class CenterUserController extends BaseController {
                     String newFileName = "face-" + userId + "." + suffix;
 
                     // 头像保存的最终位置
-                    String finalFacePath = fileSpace + uploadPathPrefix + File.separator + newFileName;
+                    String finalFacePath = fileSpace  + File.separator + uploadPathPrefix + File.separator + newFileName;
                     // 用于提供给web服务访问的地址
                     uploadPathPrefix += ("/" + newFileName);
+                    logger.info("图片地址:{}", uploadPathPrefix);
 
                     File outFile = new File(finalFacePath);
                     if (outFile.getParentFile() != null) {
@@ -174,11 +179,22 @@ public class CenterUserController extends BaseController {
                     }
                 }
             }
-
         } else {
             return JsonResult.errorMsg("文件不能为空!");
         }
+        // 加上时间戳可以防止浏览器缓存
+        String faceUrl = fileUpload.getImageServerUrl()
+                + uploadPathPrefix
+                + "?t=" + DateUtil.getCurrentDateString(DateUtil.DATE_PATTERN);
 
-        return JsonResult.ok();
+        // 更新用户头像到数据库
+        Users userResult = centerUserService.updateUserFace(userId, faceUrl);
+
+        userResult = setNullProperty(userResult);
+        CookieUtils.setCookie(request,response, USER_INFO, JsonUtils.objectToJson(userResult), true);
+
+        // TODO 后需要修改，增加令牌token，会整合进redis，分布式会话
+
+        return JsonResult.ok(userResult);
     }
 }

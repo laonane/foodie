@@ -1,11 +1,13 @@
 package wiki.laona.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import wiki.laona.resource.FileUpload;
 
 /**
  * @author laona
@@ -14,6 +16,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  **/
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+
+    @Autowired
+    private FileUpload fileUpload;
 
     /**
      * 实现静态资源映射
@@ -24,9 +29,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/**")
                 // 映射 swagger2
-                .addResourceLocations("classpath:/META-INF/resources/")
+                .addResourceLocations("classpath:/META-INF/resource/")
                 // 映射本地静态资源文件
-                .addResourceLocations("file:/E:/foodieUpload/foodie/faces/");
+                .addResourceLocations("file:/" + fileUpload.getImageUserFaceLocation());
     }
 
     @Bean

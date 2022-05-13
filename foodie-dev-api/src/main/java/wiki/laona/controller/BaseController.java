@@ -52,5 +52,5 @@ public class BaseController {
      * File.separator 文件分隔符(自适应不同系统)
      */
     public static final String IMAGE_USER_FACE_LOCATION
-            = String.format("E:%sfoodieUpload%simages", File.separator, File.separator);
+            = String.format("E:%sfoodieUpload%sfoodie%sfaces", File.separator, File.separator, File.separator);
 }
