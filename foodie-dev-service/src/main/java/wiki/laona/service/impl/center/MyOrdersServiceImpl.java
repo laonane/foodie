@@ -6,11 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
+import wiki.laona.enums.OrderStatusEnum;
+import wiki.laona.mapper.OrderStatusMapper;
 import wiki.laona.mapper.OrdersMapperCustom;
+import wiki.laona.pojo.OrderStatus;
 import wiki.laona.pojo.vo.MyOrdersVO;
 import wiki.laona.service.center.MyOrdersService;
 import wiki.laona.utils.PagedGridResult;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +30,8 @@ public class MyOrdersServiceImpl implements MyOrdersService {
 
     @Autowired
     private OrdersMapperCustom ordersMapperCustom;
+    @Autowired
+    private OrderStatusMapper orderStatusMapper;
 
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
     @Override
@@ -58,5 +65,24 @@ public class MyOrdersServiceImpl implements MyOrdersService {
         grid.setTotal(pageInfo.getPages());
         grid.setRecords(pageInfo.getTotal());
         return grid;
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public void updateDeliverOrderStatus(String orderId) {
+
+        OrderStatus waitReceiveOrderStatus = new OrderStatus();
+        waitReceiveOrderStatus.setOrderId(orderId);
+        waitReceiveOrderStatus.setOrderStatus(OrderStatusEnum.WAIT_RECEIVE.type);
+        waitReceiveOrderStatus.setDeliverTime(new Date());
+
+        Example example = new Example(OrderStatus.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("orderId", orderId);
+        criteria.andEqualTo("orderStatus", OrderStatusEnum.WAIT_DELIVER.type);
+
+        orderStatusMapper.updateByExampleSelective(waitReceiveOrderStatus, example);
+
     }
 }

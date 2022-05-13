@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import wiki.laona.controller.BaseController;
+import wiki.laona.service.OrderService;
 import wiki.laona.service.center.MyOrdersService;
 import wiki.laona.utils.JsonResult;
 import wiki.laona.utils.PagedGridResult;
@@ -22,6 +23,8 @@ public class MyOrdersController extends BaseController {
 
     @Autowired
     private MyOrdersService myOrdersService;
+    @Autowired
+    private OrderService orderService;
 
     @ApiOperation(value = "查询订单列表", notes = "查询订单列表", httpMethod = "POST")
     @PostMapping("/query")
@@ -42,5 +45,20 @@ public class MyOrdersController extends BaseController {
         PagedGridResult result = myOrdersService.queryMyOrders(userId, orderStatus, page, pageSize);
 
         return JsonResult.ok(result);
+    }
+
+
+    @ApiOperation(value = "商家发货", notes = "商家发货", httpMethod = "GET")
+    @GetMapping("/deliver")
+    public JsonResult deliver(
+            @ApiParam(name = "orderId", value = "订单id", required = true) @RequestParam String orderId) {
+
+        if (orderId == null) {
+            return JsonResult.errorMsg(null);
+        }
+
+        myOrdersService.updateDeliverOrderStatus(orderId);
+
+        return JsonResult.ok();
     }
 }
