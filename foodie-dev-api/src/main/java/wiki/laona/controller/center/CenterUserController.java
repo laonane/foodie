@@ -38,7 +38,7 @@ import java.util.Map;
  * @description 用户信息
  * @since 2022-05-12 16:56
  **/
-@Api(value = "用户信息", tags = {"用户信息的相关接口"})
+@Api(value = "用户中心-用户信息", tags = {"用户信息的相关接口"})
 @RestController
 @RequestMapping("userInfo")
 public class CenterUserController extends BaseController {

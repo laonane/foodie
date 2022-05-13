@@ -10,11 +10,11 @@ import java.io.File;
 public class BaseController {
 
     /**
-     * 评论每页的条数
+     * 分页-每页的条数
      */
-    public static final Integer COMMENT_PAGE_SIZE = 10;
+    public static final Integer COMMON_PAGE_SIZE = 10;
     /**
-     * 通用每页条数
+     * 分页-通用每页条数
      */
     public static final Integer PAGE_SIZE = 20;
     /**

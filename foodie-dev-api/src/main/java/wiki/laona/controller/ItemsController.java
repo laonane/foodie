@@ -82,7 +82,7 @@ public class ItemsController extends BaseController{
         }
         // 没有设置每页条数，则设置默认条数
         if (pageSize == null) {
-            pageSize = COMMENT_PAGE_SIZE;
+            pageSize = COMMON_PAGE_SIZE;
         }
         /*  bug fix: 解决查看全部评论时，level为空的命令 */
         if (level == 0) {
@@ -128,7 +128,7 @@ public class ItemsController extends BaseController{
         }
         // 没有设置每页条数，则设置默认条数
         if (pageSize == null) {
-            pageSize = PAGE_SIZE;
+            pageSize = COMMON_PAGE_SIZE;
         }
         PagedGridResult result = itemService.searchItemsByThirdCat(catId, sort, page, pageSize);
 

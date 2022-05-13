@@ -209,5 +209,6 @@ curl --location --request POST 'http://payment.t.mukewang.com/foodie-payment/pay
 - 查询
 - 修改
 - 图片上传
+- 限制图片上传大小
 
 ####  
