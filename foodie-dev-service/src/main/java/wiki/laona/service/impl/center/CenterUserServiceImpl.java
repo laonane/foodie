@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import wiki.laona.mapper.UsersMapper;
 import wiki.laona.pojo.Users;
-import wiki.laona.pojo.bo.CenterUsersBO;
+import wiki.laona.pojo.bo.center.CenterUsersBO;
 import wiki.laona.service.center.CenterUserService;
 
 import java.util.Date;

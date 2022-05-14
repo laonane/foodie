@@ -1,7 +1,7 @@
 package wiki.laona.service.center;
 
 import wiki.laona.pojo.Users;
-import wiki.laona.pojo.bo.CenterUsersBO;
+import wiki.laona.pojo.bo.center.CenterUsersBO;
 
 /**
  * @author laona

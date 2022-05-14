@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import wiki.laona.controller.BaseController;
 import wiki.laona.pojo.Users;
-import wiki.laona.pojo.bo.CenterUsersBO;
+import wiki.laona.pojo.bo.center.CenterUsersBO;
 import wiki.laona.resource.FileUpload;
 import wiki.laona.service.center.CenterUserService;
 import wiki.laona.utils.CookieUtils;

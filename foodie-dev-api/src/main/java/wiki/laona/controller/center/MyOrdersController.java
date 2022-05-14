@@ -3,13 +3,9 @@ package wiki.laona.controller.center;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import wiki.laona.controller.BaseController;
-import wiki.laona.pojo.Orders;
-import wiki.laona.service.OrderService;
-import wiki.laona.service.center.MyOrdersService;
 import wiki.laona.utils.JsonResult;
 import wiki.laona.utils.PagedGridResult;
 
@@ -22,11 +18,6 @@ import wiki.laona.utils.PagedGridResult;
 @RestController
 @RequestMapping("myorders")
 public class MyOrdersController extends BaseController {
-
-    @Autowired
-    private MyOrdersService myOrdersService;
-    @Autowired
-    private OrderService orderService;
 
     @ApiOperation(value = "查询订单列表", notes = "查询订单列表", httpMethod = "POST")
     @PostMapping("/query")
@@ -99,21 +90,4 @@ public class MyOrdersController extends BaseController {
         return success ? JsonResult.ok() : JsonResult.errorMsg("删除订单失败!");
     }
 
-    /**
-     * 查询订单信息是否有效
-     *
-     * @param userId  用户id
-     * @param orderId 订单id
-     * @return JsonResult
-     */
-    private JsonResult checkUserOrder(String userId, String orderId) {
-
-        Orders checkResult = myOrdersService.queryMyOrder(userId, orderId);
-
-        if (checkResult == null) {
-            return JsonResult.errorMsg("订单不存在!");
-        }
-
-        return JsonResult.ok(checkResult);
-    }
 }

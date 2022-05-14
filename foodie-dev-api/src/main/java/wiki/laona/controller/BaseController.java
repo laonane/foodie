@@ -1,5 +1,10 @@
 package wiki.laona.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import wiki.laona.pojo.Orders;
+import wiki.laona.service.center.MyOrdersService;
+import wiki.laona.utils.JsonResult;
+
 import java.io.File;
 
 /**
@@ -53,4 +58,27 @@ public class BaseController {
      */
     public static final String IMAGE_USER_FACE_LOCATION
             = String.format("E:%sfoodieUpload%sfoodie%sfaces", File.separator, File.separator, File.separator);
+
+
+
+    @Autowired
+    protected MyOrdersService myOrdersService;
+
+    /**
+     * 查询订单信息是否有效
+     *
+     * @param userId  用户id
+     * @param orderId 订单id
+     * @return JsonResult
+     */
+    protected JsonResult checkUserOrder(String userId, String orderId) {
+
+        Orders checkResult = myOrdersService.queryMyOrder(userId, orderId);
+
+        if (checkResult == null) {
+            return JsonResult.errorMsg("订单不存在!");
+        }
+
+        return JsonResult.ok(checkResult);
+    }
 }

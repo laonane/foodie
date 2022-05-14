@@ -8,6 +8,7 @@
         <result column="payMethod" property="payMethod"/>
         <result column="postAmount" property="postAmount"/>
         <result column="realPayAmount" property="realPayAmount"/>
+        <result column="isComment" property="isComment"/>
         <result column="createdTime" property="createdTime"/>
 
         <collection property="subOrderItemList"
@@ -40,7 +41,8 @@
             od.pay_method as payMethod,
             od.real_pay_amount as realPayAmount,
             od.post_amount as postAmount,
-            os.order_status as orderStatus
+            os.order_status as orderStatus,
+            od.is_comment as isComment
         from orders od
                  LEFT JOIN order_status os
                            ON os.order_id = od.id

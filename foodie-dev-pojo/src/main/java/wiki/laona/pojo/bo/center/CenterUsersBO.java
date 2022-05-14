@@ -1,4 +1,4 @@
-package wiki.laona.pojo.bo;
+package wiki.laona.pojo.bo.center;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
