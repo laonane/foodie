@@ -4,8 +4,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import wiki.laona.controller.BaseController;
+import wiki.laona.pojo.Orders;
 import wiki.laona.service.OrderService;
 import wiki.laona.service.center.MyOrdersService;
 import wiki.laona.utils.JsonResult;
@@ -60,5 +62,58 @@ public class MyOrdersController extends BaseController {
         myOrdersService.updateDeliverOrderStatus(orderId);
 
         return JsonResult.ok();
+    }
+
+
+    @ApiOperation(value = "用户确认收货", notes = "用户确认收货", httpMethod = "POST")
+    @PostMapping("/confirmReceive")
+    public JsonResult confirmReceive(
+            @ApiParam(name = "orderId", value = "订单id", required = true) @RequestParam String orderId,
+            @ApiParam(name = "userId", value = "用户id", required = true) @RequestParam String userId) {
+
+        JsonResult checkResult = checkUserOrder(userId, orderId);
+
+        if (checkResult.getStatus() != HttpStatus.OK.value()){
+            return checkResult;
+        }
+
+        boolean success = myOrdersService.updateReceiveOrderStatus(orderId);
+
+        return success ? JsonResult.ok() : JsonResult.errorMsg("用户确认收货失败!");
+    }
+
+    @ApiOperation(value = "用户删除订单", notes = "用户删除订单", httpMethod = "POST")
+    @PostMapping("/delete")
+    public JsonResult delete(
+            @ApiParam(name = "orderId", value = "订单id", required = true) @RequestParam String orderId,
+            @ApiParam(name = "userId", value = "用户id", required = true) @RequestParam String userId) {
+
+        JsonResult checkResult = checkUserOrder(userId, orderId);
+
+        if (checkResult.getStatus() != HttpStatus.OK.value()){
+            return checkResult;
+        }
+
+        boolean success = myOrdersService.delete(userId, orderId);
+
+        return success ? JsonResult.ok() : JsonResult.errorMsg("删除订单失败!");
+    }
+
+    /**
+     * 查询订单信息是否有效
+     *
+     * @param userId  用户id
+     * @param orderId 订单id
+     * @return JsonResult
+     */
+    private JsonResult checkUserOrder(String userId, String orderId) {
+
+        Orders checkResult = myOrdersService.queryMyOrder(userId, orderId);
+
+        if (checkResult == null) {
+            return JsonResult.errorMsg("订单不存在!");
+        }
+
+        return JsonResult.ok(checkResult);
     }
 }

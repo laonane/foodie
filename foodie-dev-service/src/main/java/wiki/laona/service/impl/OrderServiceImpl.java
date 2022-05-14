@@ -195,7 +195,6 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     void doCloseOrder(String orderId){
 

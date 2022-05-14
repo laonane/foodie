@@ -1,5 +1,6 @@
 package wiki.laona.service.center;
 
+import wiki.laona.pojo.Orders;
 import wiki.laona.utils.PagedGridResult;
 
 /**
@@ -25,5 +26,32 @@ public interface MyOrdersService {
      *
      * @param orderId 订单id
      */
-    void updateDeliverOrderStatus(String orderId);
+    public void updateDeliverOrderStatus(String orderId);
+
+
+    /**
+     * 查询我的订单
+     *
+     * @param userId  用户id
+     * @param orderId 订单id
+     * @return orders
+     */
+    public Orders queryMyOrder(String userId, String orderId);
+
+    /**
+     * 更改订单id的订单为收货状态
+     *
+     * @param orderId 订单id
+     * @return 更改成功
+     */
+    public boolean updateReceiveOrderStatus(String orderId);
+
+    /**
+     * 删除用户订单
+     *
+     * @param userId  用户id
+     * @param orderId 订单id
+     * @return 删除成功
+     */
+    public boolean delete(String userId, String orderId);
 }

@@ -44,7 +44,7 @@ public class OrdersController extends BaseController {
 
     @ApiOperation(value = "用户下单", notes = "用户下单", httpMethod = "POST")
     @PostMapping("/create")
-    public JsonResult list(@RequestBody SubmitOrderBO submitOrderBO) {
+    public JsonResult create(@RequestBody SubmitOrderBO submitOrderBO) {
 
         if (!Objects.equals(submitOrderBO.getPayMethod(), PayMethod.WEIXIN.type)
                 && !Objects.equals(submitOrderBO.getPayMethod(), PayMethod.ALIPAY.type)) {

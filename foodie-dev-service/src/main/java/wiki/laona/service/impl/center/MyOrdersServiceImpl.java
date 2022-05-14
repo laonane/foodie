@@ -8,9 +8,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 import wiki.laona.enums.OrderStatusEnum;
+import wiki.laona.enums.YesOrNo;
 import wiki.laona.mapper.OrderStatusMapper;
+import wiki.laona.mapper.OrdersMapper;
 import wiki.laona.mapper.OrdersMapperCustom;
 import wiki.laona.pojo.OrderStatus;
+import wiki.laona.pojo.Orders;
 import wiki.laona.pojo.vo.MyOrdersVO;
 import wiki.laona.service.center.MyOrdersService;
 import wiki.laona.utils.PagedGridResult;
@@ -32,6 +35,8 @@ public class MyOrdersServiceImpl implements MyOrdersService {
     private OrdersMapperCustom ordersMapperCustom;
     @Autowired
     private OrderStatusMapper orderStatusMapper;
+    @Autowired
+    private OrdersMapper ordersMapper;
 
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
     @Override
@@ -84,5 +89,54 @@ public class MyOrdersServiceImpl implements MyOrdersService {
 
         orderStatusMapper.updateByExampleSelective(waitReceiveOrderStatus, example);
 
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
+    @Override
+    public Orders queryMyOrder(String userId, String orderId) {
+        Orders orders = new Orders();
+        orders.setUserId(userId);
+        orders.setId(orderId);
+        orders.setIsDelete(YesOrNo.NO.type);
+
+        return ordersMapper.selectOne(orders);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public boolean updateReceiveOrderStatus(String orderId) {
+
+        OrderStatus updateOrdersStatus = new OrderStatus();
+        updateOrdersStatus.setOrderId(orderId);
+        updateOrdersStatus.setOrderStatus(OrderStatusEnum.SUCCESS.type);
+        updateOrdersStatus.setSuccessTime(new Date());
+
+        Example example = new Example(OrderStatus.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("orderId", orderId);
+        criteria.andEqualTo("orderStatus", OrderStatusEnum.WAIT_RECEIVE.type);
+
+        int effectRows = orderStatusMapper.updateByExampleSelective(updateOrdersStatus, example);
+
+        return effectRows > 0;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Override
+    public boolean delete(String userId, String orderId) {
+
+        Orders orders = new Orders();
+        orders.setId(orderId);
+        orders.setIsDelete(YesOrNo.YES.type);
+        orders.setUpdatedTime(new Date());
+
+        Example example = new Example(Orders.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("id", orderId);
+        criteria.andEqualTo("userId", userId);
+
+        int result = ordersMapper.updateByExampleSelective(orders, example);
+
+        return result > 0;
     }
 }
