@@ -1,5 +1,6 @@
 package wiki.laona.service.impl.center;
 
+import com.github.pagehelper.PageHelper;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,10 @@ import wiki.laona.pojo.OrderItems;
 import wiki.laona.pojo.OrderStatus;
 import wiki.laona.pojo.Orders;
 import wiki.laona.pojo.bo.center.OrderItemsCommentBO;
+import wiki.laona.pojo.vo.MyCommentVO;
 import wiki.laona.service.center.MyCommentsService;
+import wiki.laona.service.impl.BaseService;
+import wiki.laona.utils.PagedGridResult;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -27,7 +31,7 @@ import java.util.Map;
  * @since 2022-05-13 15:26
  **/
 @Service
-public class MyCommentsServiceImpl implements MyCommentsService {
+public class MyCommentsServiceImpl extends BaseService implements MyCommentsService {
 
     @Autowired
     private Sid sid;
@@ -76,4 +80,34 @@ public class MyCommentsServiceImpl implements MyCommentsService {
         orderStatus.setCommentTime(new Date());
         orderStatusMapper.updateByPrimaryKeySelective(orderStatus);
     }
+
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
+    @Override
+    public PagedGridResult queryMyComments(String userId, Integer page, Integer pageSize) {
+
+        Map<String, Object> paramsMap = new HashMap<>(1 << 4);
+        paramsMap.put("userId", userId);
+
+        PageHelper.startPage(page, pageSize);
+        List<MyCommentVO> list = itemsCommentsMapperCustom.queryMyComments(paramsMap);
+
+        return setterPageGrid(list, page);
+    }
+
+    // /**
+    //  * 分页操作
+    //  *
+    //  * @param list 需要分页的列表
+    //  * @param page 当前页码
+    //  * @return 分页查询结果
+    //  */
+    // private PagedGridResult setterPageGrid(List<?> list, Integer page) {
+    //     PageInfo<?> pageInfo = new PageInfo<>(list);
+    //     PagedGridResult grid = new PagedGridResult();
+    //     grid.setPage(page);
+    //     grid.setRows(list);
+    //     grid.setTotal(pageInfo.getPages());
+    //     grid.setRecords(pageInfo.getTotal());
+    //     return grid;
+    // }
 }

@@ -1,6 +1,7 @@
 package wiki.laona.service.center;
 
 import wiki.laona.pojo.Orders;
+import wiki.laona.pojo.vo.OrderStatusCountsVO;
 import wiki.laona.utils.PagedGridResult;
 
 /**
@@ -54,4 +55,22 @@ public interface MyOrdersService {
      * @return 删除成功
      */
     public boolean delete(String userId, String orderId);
+
+    /**
+     * 根据用户id查询订单状态数量
+     *
+     * @param userId 用户id
+     * @return 订单状态统计VO
+     */
+    public OrderStatusCountsVO getOrderStatusCounts(String userId);
+
+    /**
+     * 查询用户订单动向
+     *
+     * @param userId   用户id
+     * @param page     当前页码
+     * @param pageSize 每页多少条
+     * @return 订单动向
+     */
+    PagedGridResult getMyOrdersTrend(String userId, Integer page, Integer pageSize);
 }

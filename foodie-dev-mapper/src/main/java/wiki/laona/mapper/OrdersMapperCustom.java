@@ -1,6 +1,7 @@
 package wiki.laona.mapper;
 
 import org.apache.ibatis.annotations.Param;
+import wiki.laona.pojo.OrderStatus;
 import wiki.laona.pojo.vo.MyOrdersVO;
 
 import java.util.List;
@@ -20,4 +21,21 @@ public interface OrdersMapperCustom {
      * @return 订单信息
      */
     public List<MyOrdersVO> queryMyOrders(@Param("paramsMap") Map<String, Object> map);
+
+    /**
+     * 查询我的订单状态数量
+     *
+     * @param map 参数
+     * @return 订单状态数量
+     */
+    public Integer getMyOrderStatusCount(@Param("paramsMap") Map<String, Object> map);
+
+
+    /**
+     * 查询我的订单动向
+     *
+     * @param map 参数
+     * @return 订单动向
+     */
+    public List<OrderStatus> getMyOrderTrend(@Param("paramsMap") Map<String, Object> map);
 }

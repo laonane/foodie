@@ -15,6 +15,7 @@ import wiki.laona.pojo.Orders;
 import wiki.laona.pojo.bo.center.OrderItemsCommentBO;
 import wiki.laona.service.center.MyCommentsService;
 import wiki.laona.utils.JsonResult;
+import wiki.laona.utils.PagedGridResult;
 
 import java.util.List;
 
@@ -74,5 +75,26 @@ public class MyCommentsController extends BaseController {
         myCommentsService.saveComments(orderId, userId, commentList);
 
         return JsonResult.ok();
+    }
+
+
+    @ApiOperation(value = "查询我的评论", notes = "查询我的评论", httpMethod = "POST")
+    @PostMapping("/query")
+    public JsonResult query(
+            @ApiParam(name = "userId", value = "用户id", required = true) @RequestParam String userId,
+            @ApiParam(name = "page", value = "查询下一页是第几页", required = false) @RequestParam(defaultValue = "1") Integer page,
+            @ApiParam(name = "pageSize", value = "分页的每一页显示的条数", required = false) @RequestParam Integer pageSize) {
+
+        if (userId == null) {
+            return JsonResult.errorMsg(null);
+        }
+        // 没有设置每页条数，则设置默认条数
+        if (pageSize == null) {
+            pageSize = COMMON_PAGE_SIZE;
+        }
+
+        PagedGridResult result = myCommentsService.queryMyComments(userId, page, pageSize);
+
+        return JsonResult.ok(result);
     }
 }

@@ -212,4 +212,14 @@ curl --location --request POST 'http://payment.t.mukewang.com/foodie-payment/pay
 - 图片上传
 - 限制图片上传大小
 
-####  
+####  14. 评价管理
+
+- 查看评论
+- 添加评论
+- 商品明细评论展示
+- 我的评论
+
+#### 15. 订单统计
+
+- 订单状态统计
+- 动态轨迹

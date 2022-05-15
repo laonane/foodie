@@ -2,6 +2,7 @@ package wiki.laona.service.center;
 
 import wiki.laona.pojo.OrderItems;
 import wiki.laona.pojo.bo.center.OrderItemsCommentBO;
+import wiki.laona.utils.PagedGridResult;
 
 import java.util.List;
 
@@ -28,4 +29,14 @@ public interface MyCommentsService {
      * @param commentList 评论列表
      */
     public void saveComments(String orderId, String userId, List<OrderItemsCommentBO> commentList);
+
+    /**
+     * 查询我的评论列表
+     *
+     * @param userId   用户id
+     * @param page     当前页码
+     * @param pageSize 每页条数
+     * @return 评论列表
+     */
+    public PagedGridResult queryMyComments(String userId, Integer page, Integer pageSize);
 }

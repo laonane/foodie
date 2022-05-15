@@ -1,7 +1,6 @@
 package wiki.laona.service.impl.center;
 
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -15,7 +14,9 @@ import wiki.laona.mapper.OrdersMapperCustom;
 import wiki.laona.pojo.OrderStatus;
 import wiki.laona.pojo.Orders;
 import wiki.laona.pojo.vo.MyOrdersVO;
+import wiki.laona.pojo.vo.OrderStatusCountsVO;
 import wiki.laona.service.center.MyOrdersService;
+import wiki.laona.service.impl.BaseService;
 import wiki.laona.utils.PagedGridResult;
 
 import java.util.Date;
@@ -29,7 +30,7 @@ import java.util.Map;
  * @since 2022-05-13 15:26
  **/
 @Service
-public class MyOrdersServiceImpl implements MyOrdersService {
+public class MyOrdersServiceImpl extends BaseService implements MyOrdersService {
 
     @Autowired
     private OrdersMapperCustom ordersMapperCustom;
@@ -55,22 +56,22 @@ public class MyOrdersServiceImpl implements MyOrdersService {
         return setterPageGrid(list, page);
     }
 
-    /**
-     * 分页操作
-     *
-     * @param list 需要分页的列表
-     * @param page 当前页码
-     * @return 分页查询结果
-     */
-    private PagedGridResult setterPageGrid(List<?> list, Integer page) {
-        PageInfo<?> pageInfo = new PageInfo<>(list);
-        PagedGridResult grid = new PagedGridResult();
-        grid.setPage(page);
-        grid.setRows(list);
-        grid.setTotal(pageInfo.getPages());
-        grid.setRecords(pageInfo.getTotal());
-        return grid;
-    }
+    // /**
+    //  * 分页操作
+    //  *
+    //  * @param list 需要分页的列表
+    //  * @param page 当前页码
+    //  * @return 分页查询结果
+    //  */
+    // private PagedGridResult setterPageGrid(List<?> list, Integer page) {
+    //     PageInfo<?> pageInfo = new PageInfo<>(list);
+    //     PagedGridResult grid = new PagedGridResult();
+    //     grid.setPage(page);
+    //     grid.setRows(list);
+    //     grid.setTotal(pageInfo.getPages());
+    //     grid.setRecords(pageInfo.getTotal());
+    //     return grid;
+    // }
 
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -138,5 +139,42 @@ public class MyOrdersServiceImpl implements MyOrdersService {
         int result = ordersMapper.updateByExampleSelective(orders, example);
 
         return result > 0;
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
+    @Override
+    public OrderStatusCountsVO getOrderStatusCounts(String userId) {
+
+        Map<String, Object> paramsMap = new HashMap<>(1 << 4);
+        paramsMap.put("userId", userId);
+
+        paramsMap.put("orderStatus", OrderStatusEnum.WAIT_PAY.type);
+        int waitPayCounts = ordersMapperCustom.getMyOrderStatusCount(paramsMap);
+
+        paramsMap.put("orderStatus", OrderStatusEnum.WAIT_DELIVER.type);
+        int waitDeliverCounts = ordersMapperCustom.getMyOrderStatusCount(paramsMap);
+
+        paramsMap.put("orderStatus", OrderStatusEnum.WAIT_RECEIVE.type);
+        int waitReceiveCounts = ordersMapperCustom.getMyOrderStatusCount(paramsMap);
+
+        paramsMap.put("orderStatus", OrderStatusEnum.SUCCESS.type);
+        paramsMap.put("isComment", YesOrNo.YES.type);
+        int waitCommentCounts = ordersMapperCustom.getMyOrderStatusCount(paramsMap);
+
+        return new OrderStatusCountsVO(waitPayCounts, waitDeliverCounts, waitReceiveCounts, waitCommentCounts);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
+    @Override
+    public PagedGridResult getMyOrdersTrend(String userId, Integer page, Integer pageSize) {
+
+        Map<String, Object> paramsMap = new HashMap<>(1 << 4);
+        paramsMap.put("userId", userId);
+
+        PageHelper.startPage(page, pageSize);
+
+        List<OrderStatus> list = ordersMapperCustom.getMyOrderTrend(paramsMap);
+
+        return setterPageGrid(list, page);
     }
 }

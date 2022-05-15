@@ -1,7 +1,6 @@
 package wiki.laona.service.impl;
 
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -27,7 +26,7 @@ import java.util.*;
  * @date 2022-05-09 15:50
  **/
 @Service
-public class ItemServiceImpl implements ItemService {
+public class ItemServiceImpl extends BaseService implements ItemService {
 
     @Autowired
     private ItemsMapper itemsMapper;
@@ -128,22 +127,22 @@ public class ItemServiceImpl implements ItemService {
         return setterPageGrid(list, page);
     }
 
-    /**
-     * 分页操作
-     *
-     * @param list 需要分页的列表
-     * @param page 当前页码
-     * @return 分页查询结果
-     */
-    private PagedGridResult setterPageGrid(List<?> list, Integer page) {
-        PageInfo<?> pageInfo = new PageInfo<>(list);
-        PagedGridResult grid = new PagedGridResult();
-        grid.setPage(page);
-        grid.setRows(list);
-        grid.setTotal(pageInfo.getPages());
-        grid.setRecords(pageInfo.getTotal());
-        return grid;
-    }
+    // /**
+    //  * 分页操作
+    //  *
+    //  * @param list 需要分页的列表
+    //  * @param page 当前页码
+    //  * @return 分页查询结果
+    //  */
+    // private PagedGridResult setterPageGrid(List<?> list, Integer page) {
+    //     PageInfo<?> pageInfo = new PageInfo<>(list);
+    //     PagedGridResult grid = new PagedGridResult();
+    //     grid.setPage(page);
+    //     grid.setRows(list);
+    //     grid.setTotal(pageInfo.getPages());
+    //     grid.setRecords(pageInfo.getTotal());
+    //     return grid;
+    // }
 
     @Transactional(propagation = Propagation.SUPPORTS, rollbackFor = Exception.class)
     @Override

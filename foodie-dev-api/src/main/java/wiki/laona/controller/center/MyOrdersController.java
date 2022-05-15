@@ -3,9 +3,11 @@ package wiki.laona.controller.center;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import wiki.laona.controller.BaseController;
+import wiki.laona.pojo.vo.OrderStatusCountsVO;
 import wiki.laona.utils.JsonResult;
 import wiki.laona.utils.PagedGridResult;
 
@@ -64,7 +66,7 @@ public class MyOrdersController extends BaseController {
 
         JsonResult checkResult = checkUserOrder(userId, orderId);
 
-        if (checkResult.getStatus() != HttpStatus.OK.value()){
+        if (checkResult.getStatus() != HttpStatus.OK.value()) {
             return checkResult;
         }
 
@@ -81,7 +83,7 @@ public class MyOrdersController extends BaseController {
 
         JsonResult checkResult = checkUserOrder(userId, orderId);
 
-        if (checkResult.getStatus() != HttpStatus.OK.value()){
+        if (checkResult.getStatus() != HttpStatus.OK.value()) {
             return checkResult;
         }
 
@@ -90,4 +92,38 @@ public class MyOrdersController extends BaseController {
         return success ? JsonResult.ok() : JsonResult.errorMsg("删除订单失败!");
     }
 
+    @ApiOperation(value = "订单状态统计", notes = "订单状态统计", httpMethod = "POST")
+    @PostMapping("/statusCounts")
+    public JsonResult statusCounts(
+            @ApiParam(name = "userId", value = "用户id", required = true) @RequestParam String userId) {
+
+        if (StringUtils.isBlank(userId)) {
+            return JsonResult.errorMsg("参数错误!");
+        }
+
+        OrderStatusCountsVO statusCounts = myOrdersService.getOrderStatusCounts(userId);
+
+        return JsonResult.ok(statusCounts);
+    }
+
+
+    @ApiOperation(value = "查询订单动向", notes = "查询订单动向", httpMethod = "POST")
+    @PostMapping("/trend")
+    public JsonResult trend(
+            @ApiParam(name = "userId", value = "用户id", required = true) @RequestParam String userId,
+            @ApiParam(name = "page", value = "查询下一页是第几页", required = false) @RequestParam(defaultValue = "1") Integer page,
+            @ApiParam(name = "pageSize", value = "分页的每一页显示的条数", required = false) @RequestParam Integer pageSize) {
+
+        if (userId == null) {
+            return JsonResult.errorMsg(null);
+        }
+        // 没有设置每页条数，则设置默认条数
+        if (pageSize == null) {
+            pageSize = COMMON_PAGE_SIZE;
+        }
+
+        PagedGridResult result = myOrdersService.getMyOrdersTrend(userId, page, pageSize);
+
+        return JsonResult.ok(result);
+    }
 }
