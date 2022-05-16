@@ -223,3 +223,13 @@ curl --location --request POST 'http://payment.t.mukewang.com/foodie-payment/pay
 
 - 订单状态统计
 - 动态轨迹
+
+#### 16. 云服务器部署
+
+- jdk
+- tomcat
+  - 后端接口：tomcat-api
+  - 前端门户：tomcat-frontend
+  - 用户中心：tomcat-center
+- MariaDB
+- 多环境配置

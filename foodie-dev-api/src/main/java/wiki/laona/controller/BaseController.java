@@ -47,7 +47,7 @@ public class BaseController {
      * <p>
      * 流程： 微信支付成功 -> 支付中信 -> 电商平台
      */
-    public static final String RETURN_URL = "http://5afk4s.natappfree.cc/orders/notifyMerchantOrderPaid";
+    public static final String RETURN_URL = "http://api.foodie.laona.wiki:8088/foodie-dev-api/orders/notifyMerchantOrderPaid";
     /**
      * 支付中心的调用地址(生产环境)
      */

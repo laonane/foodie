@@ -15,14 +15,15 @@
         <module>foodie-dev-api</module>
     </modules>
 
-    <packaging>pom</packaging>
-
     <parent>
         <artifactId>spring-boot-starter-parent</artifactId>
         <groupId>org.springframework.boot</groupId>
         <version>2.3.5.RELEASE</version>
         <relativePath/>
     </parent>
+
+    <!--打包-->
+    <packaging>pom</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -144,7 +145,7 @@
             <version>1.18.20</version>
             <scope>provided</scope>
         </dependency>
-    
+
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
