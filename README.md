@@ -233,3 +233,4 @@ curl --location --request POST 'http://payment.t.mukewang.com/foodie-payment/pay
   - 用户中心：tomcat-center
 - MariaDB
 - 多环境配置
+- 项目打包
