@@ -51,7 +51,7 @@
         <if test=" paramsMap.orderStatus != null and paramsMap.orderStatus != '' ">
             and os.order_status = #{paramsMap.orderStatus}
         </if>
-        ORDER BY od.created_time ASC
+        ORDER BY od.created_time DESC
     </select>
 
     <select id="queryMyOrdersDotNotUse" parameterType="map" resultMap="myOrdersVO">
@@ -77,7 +77,7 @@
         <if test=" paramsMap.orderStatus != null and paramsMap.orderStatus != '' ">
             os.order_status = #{paramsMap.orderStatus}
         </if>
-        ORDER BY od.created_time ASC
+        ORDER BY od.created_time DESC
     </select>
 
     <select id="getMyOrderStatusCount" parameterType="map" resultType="int">
