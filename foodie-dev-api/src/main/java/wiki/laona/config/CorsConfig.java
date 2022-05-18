@@ -20,6 +20,10 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         // 此处是前端的请求地址，tomcat 默认 8080
         config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("http://shop.foodie.laona.wiki:8080");
+        config.addAllowedOrigin("http://center.foodie.laona.wiki:8080");
+        config.addAllowedOrigin("http://shop.foodie.laona.wiki");
+        config.addAllowedOrigin("http://center.foodie.laona.wiki");
 
         // 设置是否发送cookie信息
         config.setAllowCredentials(true);
