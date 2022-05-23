@@ -1,8 +1,11 @@
 package wiki.laona.service;
 
 import wiki.laona.pojo.OrderStatus;
+import wiki.laona.pojo.bo.ShopcartBO;
 import wiki.laona.pojo.bo.SubmitOrderBO;
 import wiki.laona.pojo.vo.OrderVO;
+
+import java.util.List;
 
 /**
  * @author laona
@@ -14,10 +17,11 @@ public interface OrderService {
     /**
      * 创建订单信息
      *
+     * @param shopcartList 购物车列表
      * @param submitOrderBO 订单信息
      * @return {@link OrderVO} 订单VO
      */
-    public OrderVO createOrder(SubmitOrderBO submitOrderBO);
+    public OrderVO createOrder(List<ShopcartBO> shopcartList, SubmitOrderBO submitOrderBO);
 
     /**
      * 根据订单id修改订单状态

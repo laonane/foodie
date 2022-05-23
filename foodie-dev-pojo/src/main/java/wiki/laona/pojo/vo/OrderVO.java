@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import wiki.laona.pojo.bo.ShopcartBO;
+
+import java.util.List;
 
 /**
  * @author laona
@@ -18,4 +21,8 @@ public class OrderVO {
 
     private String orderId;
     private MerchantOrdersVO merchantOrdersVO;
+    /**
+     * 待删除购物车列表
+     */
+    private List<ShopcartBO> shopcartList;
 }

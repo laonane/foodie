@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import wiki.laona.enums.OrderStatusEnum;
 import wiki.laona.enums.YesOrNo;
 import wiki.laona.mapper.OrderItemsMapper;
 import wiki.laona.mapper.OrderStatusMapper;
 import wiki.laona.mapper.OrdersMapper;
 import wiki.laona.pojo.*;
+import wiki.laona.pojo.bo.ShopcartBO;
 import wiki.laona.pojo.bo.SubmitOrderBO;
 import wiki.laona.pojo.vo.MerchantOrdersVO;
 import wiki.laona.pojo.vo.OrderVO;
@@ -21,7 +23,9 @@ import wiki.laona.service.AddressService;
 import wiki.laona.service.ItemService;
 import wiki.laona.service.OrderService;
 import wiki.laona.utils.DateUtil;
+import wiki.laona.utils.RedisOperator;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -48,10 +52,12 @@ public class OrderServiceImpl implements OrderService {
     private AddressService addressService;
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private RedisOperator redisOperator;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public OrderVO createOrder(SubmitOrderBO submitOrderBO) {
+    public OrderVO createOrder(List<ShopcartBO> shopcartList, SubmitOrderBO submitOrderBO) {
 
         String userId = submitOrderBO.getUserId();
         String addressId = submitOrderBO.getAddressId();
@@ -98,10 +104,13 @@ public class OrderServiceImpl implements OrderService {
         Integer totalAmount = 0;
         // 优惠后的时机支付价格累计
         Integer realPayAmount = 0;
+        List<ShopcartBO> toBeRemovedShopcartList = new ArrayList<>();
         for (String itemSpecId : itemSpecIdArr) {
-
-            // TODO 整合 redis 后，商品购买数量重新从 redis 的购物车中获取
-            int buyCounts = 1;
+            // 整合 redis 后，商品购买数量重新从 redis 的购物车中获取
+            ShopcartBO cartItem = getBuyCountsFromShopcart(shopcartList, itemSpecId);
+            int buyCounts = cartItem.getBuyCounts();
+            // 添加到待删除购物车列表中
+            toBeRemovedShopcartList.add(cartItem);
 
             // 2.1 获取商品规格
             ItemsSpec itemSpec = itemService.queryItemSpecById(itemSpecId);
@@ -154,8 +163,28 @@ public class OrderServiceImpl implements OrderService {
         OrderVO orderVO = new OrderVO();
         orderVO.setOrderId(orderId);
         orderVO.setMerchantOrdersVO(merchantOrdersVO);
+        // 待删除列表vo
+        orderVO.setShopcartList(toBeRemovedShopcartList);
 
         return orderVO;
+    }
+
+    /**
+     * 获取redis购物车中specId的商品数量
+     *
+     * @param shopcartList 购物车列表
+     * @param itemSpecId       规格id
+     * @return shopcartBO
+     */
+    private ShopcartBO getBuyCountsFromShopcart(List<ShopcartBO> shopcartList, String itemSpecId) {
+        // 整合 redis 后，商品购买数量重新从 redis 的购物车中获取
+        for (ShopcartBO sc : shopcartList) {
+            // 设置数量
+            if (ObjectUtils.nullSafeEquals(sc.getSpecId(), itemSpecId)) {
+                return sc;
+            }
+        }
+        return null;
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -196,7 +225,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    void doCloseOrder(String orderId){
+    void doCloseOrder(String orderId) {
 
         OrderStatus closeOrderStatus = orderStatusMapper.selectByPrimaryKey(orderId);
 
