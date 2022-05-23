@@ -7,16 +7,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import wiki.laona.enums.KeyEnum;
 import wiki.laona.pojo.Users;
+import wiki.laona.pojo.bo.ShopcartBO;
 import wiki.laona.pojo.bo.UserBo;
 import wiki.laona.service.UserService;
-import wiki.laona.utils.CookieUtils;
-import wiki.laona.utils.JsonResult;
-import wiki.laona.utils.JsonUtils;
-import wiki.laona.utils.MD5Utils;
+import wiki.laona.utils.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author laona
@@ -26,10 +26,12 @@ import javax.servlet.http.HttpServletResponse;
 @Api(value = "注册登录", tags = {"用于注册登录的相关接口"})
 @RestController
 @RequestMapping("passport")
-public class PassportController extends BaseController{
+public class PassportController extends BaseController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private RedisOperator redisOperator;
 
     @ApiOperation(value = "用户名是否存在", notes = "用户名是否存在", httpMethod = "GET")
     @GetMapping("/usernameIsExist")
@@ -87,6 +89,51 @@ public class PassportController extends BaseController{
         // TODO 同步购物车数据
 
         return JsonResult.ok();
+    }
+
+    /**
+     * 注册登录成功后，同步redis和cookie中的购物车数据
+     * 1. redis无数据，如果cookie中为空，不做处理
+     * 2. redis无数据，cookie有数据，同步redis
+     * 3. redis有数据，cookie无数据，同步cookie
+     * 4. redis有数据，cookie有数据。如果两者包含同一商品，以cookie为准，直接将cookie的该商品信息覆盖redis
+     */
+    private void syncShopcartData(String userId, HttpServletRequest request, HttpServletResponse response) {
+        /**
+         * 1. redis无数据，如果cookie中为空，不做处理
+         * 2. redis无数据，cookie有数据，同步redis
+         * 3. redis有数据，cookie无数据，同步cookie
+         * 4. redis有数据，cookie有数据。如果两者包含同一商品，以cookie为准，直接将cookie的该商品信息覆盖redis
+         */
+        final String shopcartKey = KeyEnum.FOODIE_SHOPCART.getKey() + ":" + userId;
+        String shopcartJson = redisOperator.get(shopcartKey);
+        String cookieValue = CookieUtils.getCookieValue(request, FOODIE_SHOPCART, true);
+        if (!org.springframework.util.StringUtils.hasText(shopcartJson)) {
+            // 2. redis无数据，cookie有数据，同步redis
+            if (org.springframework.util.StringUtils.hasText(cookieValue)) {
+                redisOperator.set(shopcartKey, cookieValue);
+            }
+        } else {
+            // redis有数据，cookie无数据，同步cookie
+            if (!org.springframework.util.StringUtils.hasText(cookieValue)) {
+                CookieUtils.setCookie(request, response, FOODIE_SHOPCART, shopcartJson, true);
+            } else {
+                // redis有数据，cookie有数据。如果两者包含同一商品，以cookie为准，直接将cookie的该商品信息覆盖redis
+                List<ShopcartBO> cookieShopcartList = JsonUtils.jsonToList(cookieValue, ShopcartBO.class);
+                List<ShopcartBO> redisShopcartList = JsonUtils.jsonToList(shopcartJson, ShopcartBO.class);
+                for (ShopcartBO cartItem : cookieShopcartList) {
+                    // 如果redis、cookie两者包含同一商品，以cookie为准，直接将cookie的该商品信息覆盖redis
+                    if (redisShopcartList.contains(cartItem)) {
+                        redisShopcartList.remove(cartItem);
+                    }
+                    redisShopcartList.add(cartItem);
+                }
+                // 重新写入cookie、redis中
+                String resultJson = JsonUtils.objectToJson(redisShopcartList);
+                redisOperator.set(shopcartKey, resultJson);
+                CookieUtils.setCookie(request, response, FOODIE_SHOPCART, resultJson, true);
+            }
+        }
     }
 
     private Users setNullProperty(Users userResult) {
