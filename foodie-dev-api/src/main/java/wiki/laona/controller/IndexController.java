@@ -92,15 +92,16 @@ public class IndexController {
         if (rootCatId == null) {
             return JsonResult.errorMsg("分类不存在");
         }
-
+        // subCategory redis键
+        final String subCategoryKey = KeyEnum.SUB_CATEGORY.getKey() + ":" + rootCatId;
         List<CategoryVO> subCatList = new ArrayList<>();
 
-        String subCategoryList = redisOperator.get(KeyEnum.SUB_CATEGORY.getKey());
-        if (StringUtils.hasText(subCategoryList)) {
-            subCatList = JsonUtils.jsonToList(subCategoryList, CategoryVO.class);
+        String subCategoryJson = redisOperator.get(subCategoryKey);
+        if (StringUtils.hasText(subCategoryJson)) {
+            subCatList = JsonUtils.jsonToList(subCategoryJson, CategoryVO.class);
         }else {
             subCatList = categoryService.getSubCatList(rootCatId);
-            redisOperator.set(KeyEnum.SUB_CATEGORY.getKey(), subCategoryList);
+            redisOperator.set(subCategoryKey, JsonUtils.objectToJson(subCatList));
         }
 
         return JsonResult.ok(subCatList);

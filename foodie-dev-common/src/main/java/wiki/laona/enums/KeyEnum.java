@@ -17,7 +17,11 @@ public enum KeyEnum {
     /**
      * 商品子分类
      */
-    SUB_CATEGORY("subCat")
+    SUB_CATEGORY("subCat"),
+    /**
+     * 购物车
+     */
+    FOODIE_SHOPCART("shopcart"),
     ;
     private String key;
 
