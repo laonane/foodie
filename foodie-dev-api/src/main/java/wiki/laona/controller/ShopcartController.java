@@ -44,8 +44,9 @@ public class ShopcartController {
             return JsonResult.errorMsg("");
         }
 
-        logger.info("购物车信息：{}", shopcartBO);
-        // TODO 前端用户在登录的情况下，添加商品到购物车，会同时同步商品到 Redis 缓存
+        // logger.info("购物车信息：{}", shopcartBO);
+
+        // 前端用户在登录的情况下，添加商品到购物车，会同时同步商品到 Redis 缓存
         final String shopcartKey = KeyEnum.FOODIE_SHOPCART.getKey() + ":" + userId;
         List<ShopcartBO> shopcartList = new ArrayList<>();
 
@@ -89,7 +90,23 @@ public class ShopcartController {
             return JsonResult.errorMsg("参数不能为空");
         }
 
-        // TODO 前端用户在登录的情况下，删除购物车的商品，同时删除 Redis 缓存中的商品
+        final String shopcartKey = KeyEnum.FOODIE_SHOPCART.getKey() + ":" + userId;
+        // 前端用户在登录的情况下，删除购物车的商品，同时删除 Redis 缓存中的商品
+        List<ShopcartBO> shopcartList = new ArrayList<>();
+        String shopcartJson = redisOperator.get(shopcartKey);
+        // redis中已有购物车
+        if (org.springframework.util.StringUtils.hasText(shopcartJson)) {
+            shopcartList = JsonUtils.jsonToList(shopcartJson, ShopcartBO.class);
+            // 删除redis中商品
+            for (ShopcartBO sc : shopcartList) {
+                if (ObjectUtils.nullSafeEquals(sc.getSpecId(), itemSpecId)) {
+                    shopcartList.remove(sc);
+                    break;
+                }
+            }
+            // 覆盖现有的redis中的购物车
+            redisOperator.set(shopcartKey, JsonUtils.objectToJson(shopcartList));
+        }
 
         return JsonResult.ok();
     }
