@@ -136,8 +136,11 @@ public class PassportController extends BaseController {
                     shopcartMap.put(cartItem.getItemId() + cartItem.getSpecId(), cartItem);
                 }
 
-                // 暂存购物车数据
-                List<ShopcartBO> cartResultList = (List<ShopcartBO>) shopcartMap.values();
+                // 最新购物车数据
+                List<ShopcartBO> cartResultList = new ArrayList<>();
+                for (String key : shopcartMap.keySet()) {
+                    cartResultList.add(shopcartMap.get(key));
+                }
 
                 // 重新写入cookie、redis中
                 String cartResultJson = JsonUtils.objectToJson(cartResultList);
@@ -178,7 +181,7 @@ public class PassportController extends BaseController {
         userResult = setNullProperty(userResult);
 
         // 用户信息设置到 cookie
-        CookieUtils.setCookie(req, resp, "user", JsonUtils.objectToJson(userResult), true);
+        CookieUtils.setCookie(req, resp, USER_INFO, JsonUtils.objectToJson(userResult), true);
 
         // 同步购物车数据
         syncShopcartData(userResult.getId(), req, resp);
@@ -190,9 +193,10 @@ public class PassportController extends BaseController {
     @PostMapping("/logout")
     public JsonResult logout(@RequestParam String userId, HttpServletRequest req, HttpServletResponse resp) {
         // 清除用户相关的 cookie 信息
-        CookieUtils.deleteCookie(req, resp, "user");
+        CookieUtils.deleteCookie(req, resp, USER_INFO);
 
-        // TODO 用户退出登录，就需要清空购物车
+        // 用户退出登录，就需要清空购物车
+        CookieUtils.deleteCookie(req, resp, FOODIE_SHOPCART);
         // TODO 分布式绘画中需要清除用户数据
 
         return JsonResult.ok();
