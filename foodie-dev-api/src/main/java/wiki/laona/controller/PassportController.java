@@ -16,7 +16,7 @@ import wiki.laona.utils.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author laona
@@ -86,7 +86,9 @@ public class PassportController extends BaseController {
         CookieUtils.setCookie(req, resp, USER_INFO, JsonUtils.objectToJson(userResult), true);
 
         // TODO 生成用户token，存入 Redis 会话
-        // TODO 同步购物车数据
+
+        // 同步购物车数据
+        syncShopcartData(userResult.getId(), req, resp);
 
         return JsonResult.ok();
     }
@@ -97,41 +99,50 @@ public class PassportController extends BaseController {
      * 2. redis无数据，cookie有数据，同步redis
      * 3. redis有数据，cookie无数据，同步cookie
      * 4. redis有数据，cookie有数据。如果两者包含同一商品，以cookie为准，直接将cookie的该商品信息覆盖redis
+     * 5. 同步到redis中后，需要覆盖本地cookie的数据，保证cookie的数据是最新的
      */
     private void syncShopcartData(String userId, HttpServletRequest request, HttpServletResponse response) {
-        /**
-         * 1. redis无数据，如果cookie中为空，不做处理
-         * 2. redis无数据，cookie有数据，同步redis
-         * 3. redis有数据，cookie无数据，同步cookie
-         * 4. redis有数据，cookie有数据。如果两者包含同一商品，以cookie为准，直接将cookie的该商品信息覆盖redis
-         */
+
         final String shopcartKey = KeyEnum.FOODIE_SHOPCART.getKey() + ":" + userId;
-        String shopcartJson = redisOperator.get(shopcartKey);
-        String cookieValue = CookieUtils.getCookieValue(request, FOODIE_SHOPCART, true);
-        if (!org.springframework.util.StringUtils.hasText(shopcartJson)) {
+
+        // redis中的购物车数据
+        String shopcartJsonRedis = redisOperator.get(shopcartKey);
+
+        // redis中cookie数据
+        String shopcartJsonCookie = CookieUtils.getCookieValue(request, FOODIE_SHOPCART, true);
+
+        if (!org.springframework.util.StringUtils.hasText(shopcartJsonRedis)) {
             // 2. redis无数据，cookie有数据，同步redis
-            if (org.springframework.util.StringUtils.hasText(cookieValue)) {
-                redisOperator.set(shopcartKey, cookieValue);
+            if (org.springframework.util.StringUtils.hasText(shopcartJsonCookie)) {
+                redisOperator.set(shopcartKey, shopcartJsonCookie);
             }
         } else {
             // redis有数据，cookie无数据，同步cookie
-            if (!org.springframework.util.StringUtils.hasText(cookieValue)) {
-                CookieUtils.setCookie(request, response, FOODIE_SHOPCART, shopcartJson, true);
+            if (!org.springframework.util.StringUtils.hasText(shopcartJsonCookie)) {
+                CookieUtils.setCookie(request, response, FOODIE_SHOPCART, shopcartJsonRedis, true);
             } else {
                 // redis有数据，cookie有数据。如果两者包含同一商品，以cookie为准，直接将cookie的该商品信息覆盖redis
-                List<ShopcartBO> cookieShopcartList = JsonUtils.jsonToList(cookieValue, ShopcartBO.class);
-                List<ShopcartBO> redisShopcartList = JsonUtils.jsonToList(shopcartJson, ShopcartBO.class);
-                for (ShopcartBO cartItem : cookieShopcartList) {
-                    // 如果redis、cookie两者包含同一商品，以cookie为准，直接将cookie的该商品信息覆盖redis
-                    if (redisShopcartList.contains(cartItem)) {
-                        redisShopcartList.remove(cartItem);
-                    }
-                    redisShopcartList.add(cartItem);
+                List<ShopcartBO> cookieShopcartList = JsonUtils.jsonToList(shopcartJsonCookie, ShopcartBO.class);
+                List<ShopcartBO> redisShopcartList = JsonUtils.jsonToList(shopcartJsonRedis, ShopcartBO.class);
+
+                // 通过Map过滤重复元素
+                Map<String, ShopcartBO> shopcartMap = new HashMap<>(1 << 4);
+                for (ShopcartBO cartItem : redisShopcartList) {
+                    shopcartMap.put(cartItem.getItemId() + cartItem.getSpecId(), cartItem);
                 }
+
+                // 如果redis、cookie两者包含同一商品，以cookie为准，直接将cookie的该商品信息覆盖redis
+                for (ShopcartBO cartItem : cookieShopcartList) {
+                    shopcartMap.put(cartItem.getItemId() + cartItem.getSpecId(), cartItem);
+                }
+
+                // 暂存购物车数据
+                List<ShopcartBO> cartResultList = (List<ShopcartBO>) shopcartMap.values();
+
                 // 重新写入cookie、redis中
-                String resultJson = JsonUtils.objectToJson(redisShopcartList);
-                redisOperator.set(shopcartKey, resultJson);
-                CookieUtils.setCookie(request, response, FOODIE_SHOPCART, resultJson, true);
+                String cartResultJson = JsonUtils.objectToJson(cartResultList);
+                redisOperator.set(shopcartKey, cartResultJson);
+                CookieUtils.setCookie(request, response, FOODIE_SHOPCART, cartResultJson, true);
             }
         }
     }
@@ -168,6 +179,10 @@ public class PassportController extends BaseController {
 
         // 用户信息设置到 cookie
         CookieUtils.setCookie(req, resp, "user", JsonUtils.objectToJson(userResult), true);
+
+        // 同步购物车数据
+        syncShopcartData(userResult.getId(), req, resp);
+
         return JsonResult.ok(userResult);
     }
 
