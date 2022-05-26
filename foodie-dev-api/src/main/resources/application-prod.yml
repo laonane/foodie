@@ -7,10 +7,19 @@ spring:
 #    username: root
     password: 123456
   redis:
+    # Redis 单机模式
+#    database: 1
+#    host: localhost
+#    password:
+#    port: 6379
+    # Redis 哨兵模式
     database: 1
     host: localhost
-    password:
+    password: laona
     port: 6379
+    sentinel:
+      master: laona-master
+      nodes: 127.0.0.1:26379, 127.0.0.1:26381, 127.0.0.1:26381
 
 mybatis:
 #  configuration:
