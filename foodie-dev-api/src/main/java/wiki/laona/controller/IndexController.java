@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,7 +53,7 @@ public class IndexController {
         String carouselStr = redisOperator.get("carousel");
         if (StringUtils.hasText(carouselStr)) {
             list = JsonUtils.jsonToList(carouselStr, Carousel.class);
-        }else {
+        } else {
             // 查询数据库中的数据
             list = carouselService.queryAll(YesOrNo.YES.type);
             // 存入 redis
@@ -76,7 +77,7 @@ public class IndexController {
 
         if (StringUtils.hasText(categoryStr)) {
             categoryList = JsonUtils.jsonToList(categoryStr, Category.class);
-        }else {
+        } else {
             categoryList = categoryService.queryAllRootLevelCat();
             redisOperator.set(KeyEnum.CATEGORY.getKey(), JsonUtils.objectToJson(categoryList));
         }
@@ -99,9 +100,15 @@ public class IndexController {
         String subCategoryJson = redisOperator.get(subCategoryKey);
         if (StringUtils.hasText(subCategoryJson)) {
             subCatList = JsonUtils.jsonToList(subCategoryJson, CategoryVO.class);
-        }else {
+        } else {
             subCatList = categoryService.getSubCatList(rootCatId);
-            redisOperator.set(subCategoryKey, JsonUtils.objectToJson(subCatList));
+            // 下面的情况会导致redis缓存穿透
+            if (!CollectionUtils.isEmpty(subCatList)) {
+                // 查询到有数据才保存到 redis 中
+                redisOperator.set(subCategoryKey, JsonUtils.objectToJson(subCatList));
+            }else {
+                redisOperator.set(subCategoryKey, JsonUtils.objectToJson(subCatList), 5 * 60);
+            }
         }
 
         return JsonResult.ok(subCatList);

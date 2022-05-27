@@ -11,7 +11,7 @@
 
     <artifactId>foodie-dev-api</artifactId>
     <!--打成war包方式-->
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
