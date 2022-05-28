@@ -1,11 +1,16 @@
 package wiki.laona.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanUtils;
 import wiki.laona.pojo.Orders;
+import wiki.laona.pojo.Users;
+import wiki.laona.pojo.vo.UsersVO;
 import wiki.laona.service.center.MyOrdersService;
 import wiki.laona.utils.JsonResult;
+import wiki.laona.utils.RedisOperator;
 
+import javax.annotation.Resource;
 import java.io.File;
+import java.util.UUID;
 
 /**
  * @author laona
@@ -64,9 +69,10 @@ public class BaseController {
             = String.format("E:%sfoodieUpload%sfoodie%sfaces", File.separator, File.separator, File.separator);
 
 
-
-    @Autowired
+    @Resource
     protected MyOrdersService myOrdersService;
+    @Resource
+    protected RedisOperator redisOperator;
 
     /**
      * 查询订单信息是否有效
@@ -84,5 +90,22 @@ public class BaseController {
         }
 
         return JsonResult.ok(checkResult);
+    }
+
+    /**
+     * 将 Users 实体转换成 UsersVO
+     *
+     * @param user 用户信息
+     * @return UsersVO
+     */
+    protected UsersVO conventUserVO(Users user) {
+        // 实现用户的 redis 会话
+        String uniqueToken = UUID.randomUUID().toString().trim();
+        redisOperator.set(REDIS_USER_TOKEN + ":" + user.getId(), uniqueToken);
+
+        UsersVO usersVO = new UsersVO();
+        BeanUtils.copyProperties(user, usersVO);
+        usersVO.setUserUniqueToken(uniqueToken);
+        return usersVO;
     }
 }

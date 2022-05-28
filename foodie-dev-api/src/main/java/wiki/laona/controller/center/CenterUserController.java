@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import wiki.laona.controller.BaseController;
 import wiki.laona.pojo.Users;
 import wiki.laona.pojo.bo.center.CenterUsersBO;
+import wiki.laona.pojo.vo.UsersVO;
 import wiki.laona.resource.FileUpload;
 import wiki.laona.service.center.CenterUserService;
 import wiki.laona.utils.CookieUtils;
@@ -68,11 +69,12 @@ public class CenterUserController extends BaseController {
         }
 
         Users userResult = centerUserService.updateUserInfo(userId, centerUsersBO);
-        userResult = setNullProperty(userResult);
+        //  redis 实现用户会话
+        UsersVO usersVO = conventUserVO(userResult);
 
-        CookieUtils.setCookie(request, response, USER_INFO, JsonUtils.objectToJson(userResult),true);
+        CookieUtils.setCookie(request, response, USER_INFO, JsonUtils.objectToJson(usersVO),true);
 
-        // TODO 后需要修改，增加令牌token，会整合进redis，分布式会话
+        // 增加令牌token，会整合进redis，分布式会话
 
         return JsonResult.ok();
     }
@@ -190,11 +192,13 @@ public class CenterUserController extends BaseController {
         // 更新用户头像到数据库
         Users userResult = centerUserService.updateUserFace(userId, faceUrl);
 
-        userResult = setNullProperty(userResult);
-        CookieUtils.setCookie(request,response, USER_INFO, JsonUtils.objectToJson(userResult), true);
+        // 增加令牌token，会整合进redis，分布式会话
+        UsersVO usersVO = conventUserVO(userResult);
 
-        // TODO 后需要修改，增加令牌token，会整合进redis，分布式会话
+        // 设置cookie
+        CookieUtils.setCookie(request,response, USER_INFO, JsonUtils.objectToJson(usersVO), true);
 
         return JsonResult.ok(userResult);
     }
+
 }

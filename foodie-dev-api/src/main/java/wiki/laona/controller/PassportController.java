@@ -4,7 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +17,10 @@ import wiki.laona.utils.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author laona
@@ -98,22 +100,6 @@ public class PassportController extends BaseController {
         return JsonResult.ok();
     }
 
-    /**
-     * 将 Users 实体转换成 UsersVO
-     *
-     * @param user 用户信息
-     * @return UsersVO
-     */
-    private UsersVO conventUserVO(Users user) {
-        // 实现用户的 redis 会话
-        String uniqueToken = UUID.randomUUID().toString().trim();
-        redisOperator.set(REDIS_USER_TOKEN + ":" + user.getId(), uniqueToken);
-
-        UsersVO usersVO = new UsersVO();
-        BeanUtils.copyProperties(user, usersVO);
-        usersVO.setUserUniqueToken(uniqueToken);
-        return usersVO;
-    }
 
     /**
      * 注册登录成功后，同步redis和cookie中的购物车数据
