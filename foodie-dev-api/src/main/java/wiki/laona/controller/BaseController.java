@@ -43,6 +43,10 @@ public class BaseController {
      */
     public static final String FOODIE_SHOPCART = "shopcart";
     /**
+     * redis中用户唯一token
+     */
+    public static final String REDIS_USER_TOKEN = "user_unique_token";
+    /**
      * 回调通知url
      * <p>
      * 流程： 微信支付成功 -> 支付中信 -> 电商平台

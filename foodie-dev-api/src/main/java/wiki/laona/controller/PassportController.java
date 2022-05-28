@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import wiki.laona.enums.KeyEnum;
 import wiki.laona.pojo.Users;
 import wiki.laona.pojo.bo.ShopcartBO;
 import wiki.laona.pojo.bo.UserBo;
+import wiki.laona.pojo.vo.UsersVO;
 import wiki.laona.service.UserService;
 import wiki.laona.utils.*;
 
@@ -79,18 +81,38 @@ public class PassportController extends BaseController {
         }
         // 5. 注册用户
         Users userResult = userService.createUser(userBo);
+
         // 去除隐私信息
-        userResult = setNullProperty(userResult);
+        // userResult = setNullProperty(userResult);
+
+        // 生成用户token，存入 Redis 会话
+        // 实现用户的 redis 会话
+        UsersVO usersVO = conventUserVO(userResult);
 
         // 6. 保存 cookie
-        CookieUtils.setCookie(req, resp, USER_INFO, JsonUtils.objectToJson(userResult), true);
-
-        // TODO 生成用户token，存入 Redis 会话
+        CookieUtils.setCookie(req, resp, USER_INFO, JsonUtils.objectToJson(usersVO), true);
 
         // 同步购物车数据
         syncShopcartData(userResult.getId(), req, resp);
 
         return JsonResult.ok();
+    }
+
+    /**
+     * 将 Users 实体转换成 UsersVO
+     *
+     * @param user 用户信息
+     * @return UsersVO
+     */
+    private UsersVO conventUserVO(Users user) {
+        // 实现用户的 redis 会话
+        String uniqueToken = UUID.randomUUID().toString().trim();
+        redisOperator.set(REDIS_USER_TOKEN + ":" + user.getId(), uniqueToken);
+
+        UsersVO usersVO = new UsersVO();
+        BeanUtils.copyProperties(user, usersVO);
+        usersVO.setUserUniqueToken(uniqueToken);
+        return usersVO;
     }
 
     /**
@@ -150,6 +172,7 @@ public class PassportController extends BaseController {
         }
     }
 
+
     private Users setNullProperty(Users userResult) {
         userResult.setPassword(null);
         userResult.setMobile(null);
@@ -178,10 +201,11 @@ public class PassportController extends BaseController {
             return JsonResult.errorMsg("用户名或密码不正确");
         }
 
-        userResult = setNullProperty(userResult);
+        // 将用户信息转换成 UsersVO，并保存到 redis 中
+        UsersVO usersVO = conventUserVO(userResult);
 
         // 用户信息设置到 cookie
-        CookieUtils.setCookie(req, resp, USER_INFO, JsonUtils.objectToJson(userResult), true);
+        CookieUtils.setCookie(req, resp, USER_INFO, JsonUtils.objectToJson(usersVO), true);
 
         // 同步购物车数据
         syncShopcartData(userResult.getId(), req, resp);
@@ -192,12 +216,15 @@ public class PassportController extends BaseController {
     @ApiOperation(value = "退出登录", notes = "退出登录", httpMethod = "POST")
     @PostMapping("/logout")
     public JsonResult logout(@RequestParam String userId, HttpServletRequest req, HttpServletResponse resp) {
+
         // 清除用户相关的 cookie 信息
         CookieUtils.deleteCookie(req, resp, USER_INFO);
 
-        // 用户退出登录，就需要清空购物车
+        // 用户退出，清理redis中的user会话信息
+        redisOperator.del(REDIS_USER_TOKEN + ":" + userId);
+
+        // 分布式会话中需要清除用户数据
         CookieUtils.deleteCookie(req, resp, FOODIE_SHOPCART);
-        // TODO 分布式绘画中需要清除用户数据
 
         return JsonResult.ok();
     }
