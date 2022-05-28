@@ -8,12 +8,15 @@ import wiki.laona.utils.JsonResult;
 import wiki.laona.utils.RedisOperator;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author laona
  * @description redisController
  * @since 2022-05-23 15:26
  **/
+// @Api("redis")
 @ApiIgnore
 @RestController
 @RequestMapping("redis")
@@ -45,4 +48,34 @@ public class RedisController {
         redisOperator.del(key);
         return JsonResult.ok();
     }
+
+    /**
+     * 批量查询 mget
+     *
+     * @param keys 查询keys
+     * @return Result
+     */
+    @GetMapping("mget")
+    public JsonResult mget(String... keys) {
+
+        List<String> keyList = Arrays.asList(keys);
+        List<String> result = redisOperator.mget(keyList);
+
+        return JsonResult.ok(result);
+    }
+
+    /**
+     * 批量查询 batch
+     * @param keys
+     * @return
+     */
+    @GetMapping("batchGet")
+    public JsonResult batchGet(String... keys) {
+
+        List<String> keyList = Arrays.asList(keys);
+        List<Object> result = redisOperator.batchGet(keyList);
+
+        return JsonResult.ok(result);
+    }
+
 }
