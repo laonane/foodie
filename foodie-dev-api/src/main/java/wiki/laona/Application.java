@@ -7,6 +7,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import tk.mybatis.spring.annotation.MapperScan;
 
 import java.net.InetAddress;
@@ -20,6 +21,7 @@ import java.net.InetAddress;
 @MapperScan(basePackages = {"wiki.laona.mapper"})
 @ComponentScan(basePackages = {"wiki.laona", "org.n3r.idworker"})
 @EnableScheduling
+@EnableRedisHttpSession     // 开启使用redis作为spring session
 public class Application {
 
     public static void main(String[] args) {

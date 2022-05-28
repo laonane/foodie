@@ -1,14 +1,12 @@
 package wiki.laona.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.HttpMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
-
 import wiki.laona.utils.JsonResult;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +44,7 @@ public class HelloController {
         // 设置过期时间
         session.setMaxInactiveInterval(3600);
         Object info = session.getAttribute("userInfo");
-        System.out.println(info);
+        logger.info(info.toString());
         return JsonResult.ok();
     }
 }
