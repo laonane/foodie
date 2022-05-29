@@ -3,6 +3,7 @@ package wiki.laona;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
@@ -17,7 +18,7 @@ import java.net.InetAddress;
  * @description api application
  * @date 2022-04-26 19:53
  **/
-@SpringBootApplication
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @MapperScan(basePackages = {"wiki.laona.mapper"})
 @ComponentScan(basePackages = {"wiki.laona", "org.n3r.idworker"})
 @EnableScheduling
