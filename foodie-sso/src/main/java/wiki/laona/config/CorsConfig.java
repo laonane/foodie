@@ -24,6 +24,12 @@ public class CorsConfig {
         config.addAllowedOrigin("http://center.foodie.laona.wiki:8080");
         config.addAllowedOrigin("http://shop.foodie.laona.wiki");
         config.addAllowedOrigin("http://center.foodie.laona.wiki");
+        config.addAllowedOrigin("http://www.mtv.com");
+        config.addAllowedOrigin("http://www.mtv.com:8080");
+        config.addAllowedOrigin("http://www.sso.com");
+        config.addAllowedOrigin("http://www.sso.com:8080");
+        config.addAllowedOrigin("http://www.music.com");
+        config.addAllowedOrigin("http://www.music.com:8080");
         config.addAllowedOrigin("*");
 
         // 设置是否发送cookie信息
